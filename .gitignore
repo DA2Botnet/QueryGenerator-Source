@@ -1,3 +1,9 @@
+# Mac
+.DS_STORE
+
+# VS CODE
+.vscode/
+
 # Compiled class file
 *.class
 
