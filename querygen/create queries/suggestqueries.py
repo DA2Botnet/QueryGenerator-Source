@@ -7,7 +7,11 @@ import pandas as pd
 
 # keyword=input('Add your keyword: ')
 
-keywords = 'google,youtube,times,apple,linkedin,docs,microsoft,wordpress,wikepedia,whatsapp,adobe,facebook,instagram,snapchat,amazon,myspace,nytimes,daily motion,imdb,forbes,the guardian,office,pinterest,google plus,new york,LA,super bowl,fidget spinner,news,dog,movie,recepie,food,havana,music,disney,baby,babies,diet,joke,joker,avenger,marvel,lizzo,BTS,songs,spotify,vimeo,covid,coronavirus,simp,quarantine,simp,games,video games,jackbox,twitch,WAP,ozark,cobra kai,ISIS,frozen,ukraine,actress,actor,musical,subaru,dodge,lion king,tesla,honda,elon musk,spacex,nasa,rocket,moon,mars,bitcoin,dogecoin,watch,haircut,jeans,fasion,dress,mlb,nba,nsa,nft,ncaa,nfl,madden,nba 2k,fifa,sears,football,soccer,rugby,volleyball,baseball,tablet,ipad,iphone,kindle,ikea,starbucks,airport,casino,laundromat,egypt,lego,books,store,computer,impostor,among us,olympics,skyrim,overwatch,league of legends,valorant,riot games,blizzard,paris,france,germany,flight,tv shows,crossfit,election,trump,beer,coors,mcdonalds,chick fil a,ps5,moes,taco bell,wendys,gas station,meme,funny,porn'.split(',')
+keywords = 'jackbox,twitch,WAP,ozark,cobra kai,ISIS,frozen,ukraine,actress,actor,musical,subaru,dodge,lion king,tesla,honda,elon musk,spacex,nasa,rocket,moon,mars,bitcoin,dogecoin,watch,haircut,jeans,fasion,dress,mlb,nba,nsa,nft,ncaa,nfl,madden,nba 2k,fifa,sears,football,soccer,rugby,volleyball,baseball,tablet,ipad,iphone,kindle,ikea,starbucks,airport,casino,laundromat,egypt,lego,books,store,computer,impostor,among us,olympics,skyrim,overwatch,league of legends,valorant,riot games,blizzard,paris,france,germany,flight,tv shows,crossfit,election,trump,beer,coors,mcdonalds,chick fil a,ps5,moes,taco bell,wendys,gas station,meme,funny,porn,school,pencil,fortnite,epic games,monitor,lights,switch,window,kitchen,bed,mattress,blanket,pillow,plant,garden,hammock,christmas,gift,glasses'.split(',')
+
+'''
+Used words: google,youtube,times,apple,linkedin,docs,microsoft,wordpress,wikepedia,whatsapp,adobe,facebook,instagram,snapchat,amazon,myspace,nytimes,daily motion,imdb,forbes,the guardian,office,pinterest,google plus,new york,LA,super bowl,fidget spinner,news,dog,movie,recepie,food,havana,music,disney,baby,babies,diet,joke,joker,avenger,marvel,lizzo,BTS,songs,spotify,vimeo,covid,coronavirus,simp,quarantine,games,video games,
+'''
 
 '''
 api_call makes the first api call to get the initial 10 queries
@@ -59,7 +63,7 @@ def prefixes(keyword,keywords):
         
         for n in range(length):
             print(kws[n])
-            keywords.append(kws[n])
+            keywords.append(kws[n].replace(' ', '+'))
             
 '''
 suffixes adds a value from the prefix list after the keyword we passed 
@@ -86,7 +90,7 @@ def suffixes(keyword,keywords):
         
         for n in range(length):
             print(kws[n])
-            keywords.append(kws[n])   
+            keywords.append(kws[n].replace(' ', '+'))   
 '''
 get more takes the keywords list and runs the keywords via the
 api to get more suggestions. Every new suggestion is stored back in
@@ -109,7 +113,7 @@ def get_more(keyword,keywords):
             
             for n in range(length):
                 print(keywords2[n])
-                keywords.append(keywords2[n])
+                keywords.append(keywords2[n].replace(' ', '+'))
                 print(len(keywords))
             
                    
@@ -124,7 +128,7 @@ def get_more(keyword,keywords):
         json_hist = df.to_json(orient="table")
 
         #Exporting all keywords to CSV
-        df.to_csv(keyword+'-keywords.csv')
+        df.to_csv(path_or_buf=rf'C:\Users\cbenj\Documents\QueryGenerator-Source\querygen\create queries\{keyword}-keywords.csv')
 
 for keyword in keywords: 
     api_call(keyword)
