@@ -12,10 +12,12 @@ import com.jtelaa.da2.lib.config.PropertiesUtils;
 import com.jtelaa.da2.lib.console.ConsoleBanners;
 import com.jtelaa.da2.lib.console.ConsoleColors;
 import com.jtelaa.da2.lib.control.ComputerControl;
+import com.jtelaa.da2.lib.franchise.FranchiseUtils;
 import com.jtelaa.da2.lib.log.Log;
 import com.jtelaa.da2.lib.misc.MiscUtil;
 import com.jtelaa.da2.lib.net.NetTools;
 import com.jtelaa.da2.lib.sql.DA2SQLQueries;
+import com.jtelaa.da2.lib.sql.EmptySQLURLException;
 import com.jtelaa.da2.lib.sql.SQL;
 
 /**
@@ -70,10 +72,16 @@ public class Main {
 
         my_config = PropertiesUtils.importConfig(properties_path); 
 
-        my_config.setProperty("log_ip", resolveDefaultLogIP());
-        my_config.setProperty("db_ip", resolveDefaultDBIP());
+        my_config.setProperty("log_ip", FranchiseUtils.resolveDefaultLogIP());
+        my_config.setProperty("db_ip", FranchiseUtils.resolveDefaultDBIP());
 
-        querySettings();
+        try {
+            querySettings();
+
+        } catch (EmptySQLURLException e) {
+            e.printStackTrace();
+
+        }
 
         // Start Logging
         Log.loadConfig(my_config, args);
@@ -158,47 +166,30 @@ public class Main {
      * @return
      */
 
-    private static void querySettings() {
-        Properties my_new_config = new Properties();
-        String connectionURL = SQL.getConnectionURL(my_config.getProperty("db_ip"), "BW_Main", "querygen", "Passw0rd!");
+    private static void querySettings() throws EmptySQLURLException {
+        String database = my_config.getProperty("database");
+        String table_name = my_config.getProperty("table");
+        String id_type = my_config.getProperty("key");
+        String db_ip = my_config.getProperty("db_ip");
+        String user = my_config.getProperty("db_user");
+        String passwd = my_config.getProperty("db_passwd");
+
+        DA2SQLQueries.connectionURL = SQL.getConnectionURL(db_ip, database, user, passwd);
 
         // TODO Implement other config        
 
         // Get ID
-        int id = DA2SQLQueries.getID("QueryGenerators", connectionURL);
-        my_new_config.setProperty("id", id + "");
+        int id = DA2SQLQueries.getID(database, table_name, id_type, "IP", NetTools.getLocalIP());
+        my_config.setProperty("id", id + "");
         
         // Get Request Port
-        my_new_config.setProperty("request_port", BWSQLQueries.getRequestPort(id, "QueryGenerators", connectionURL) + "");
+        my_config.setProperty("request_port", DA2SQLQueries.queryByID(database, table_name, id_type, id, "RequestPort"));
 
         // Get Request Port
-        my_new_config.setProperty("receive_port", BWSQLQueries.getReceivePort(id, "QueryGenerators", connectionURL) + "");
+        my_config.setProperty("receive_port", DA2SQLQueries.queryByID(database, table_name, id_type, id, "RecievePort"));
 
-        my_config = my_new_config;
         PropertiesUtils.exportConfig(properties_path, my_config);
 
-    }
-
-    /**
-     * 
-     * @return
-     */
-
-    private static String resolveDefaultDBIP() {
-        String my_ip = NetTools.getLocalIP();
-
-        return my_ip.substring(0, my_ip.lastIndexOf(".")) + 2;
-    }
-
-    /**
-     * 
-     * @return
-     */
-
-    private static String resolveDefaultLogIP() {
-        String my_ip = NetTools.getLocalIP();
-
-        return my_ip.substring(0, my_ip.lastIndexOf(".")) + 1;
     }
     
 }
