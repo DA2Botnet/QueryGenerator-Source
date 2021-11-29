@@ -11,8 +11,10 @@ import com.jtelaa.bwbot.querygen.util.SysCLI;
 import com.jtelaa.da2.lib.config.PropertiesUtils;
 import com.jtelaa.da2.lib.console.ConsoleBanners;
 import com.jtelaa.da2.lib.console.ConsoleColors;
+import com.jtelaa.da2.lib.control.ComputerControl;
 import com.jtelaa.da2.lib.log.Log;
 import com.jtelaa.da2.lib.misc.MiscUtil;
+import com.jtelaa.da2.lib.net.NetTools;
 import com.jtelaa.da2.lib.sql.DA2SQLQueries;
 import com.jtelaa.da2.lib.sql.SQL;
 
@@ -29,10 +31,6 @@ import com.jtelaa.da2.lib.sql.SQL;
  // TODO Find a way to include files in the jar
 
 public class Main {
-
-    /** Default Director IP */
-    public static final String DEFAULT_DIRECTOR_IP = "172.16.2.1";
-
     /** The remote cli local object */ 
     public static RemoteCLI rem_cli;
 
@@ -42,22 +40,40 @@ public class Main {
     /** Local configuration handler */
     public static Properties my_config;
 
+    /** Properties file path */
+    public static String properties_path = "~/querygen_config.properties";
+    public static String banners_directory = "~/banners/";
+
     public static void main(String[] args) {
         // Check for first time setup
         boolean first_time = false;
         for (String arg : args) {
             if (arg.equalsIgnoreCase("setup")) {
-                System.out.println("Running in setup mode");
-
-                my_config = querySettings();
-
-                break;
-
+                Log.sendManSysMessage("Loading first - time config");
+                first_time = true;
             }
         }
 
         // Load normally if not first time
-        if (!first_time) { my_config = PropertiesUtils.importConfig("config.properties"); }
+        if (first_time) {
+            // Get banners
+            Log.sendManSysMessage("Loading banners");
+            ComputerControl.sendCommand("mkdir ~/banners/");
+            ComputerControl.sendCommand("cd ~/banners/ && curl https://raw.githubusercontent.com/DA2Botnet/DA2Botnet.github.io/main/banners/MainBanner.txt > MainBanner.txt");
+            ComputerControl.sendCommand("cd ~/banners/ && curl https://raw.githubusercontent.com/DA2Botnet/DA2Botnet.github.io/main/banners/QueryGen.txt > QueryGen.txt");
+
+            // Get config template
+            Log.sendManSysMessage("Loading config template");
+            ComputerControl.sendCommand("cd ~/ && curl https://raw.githubusercontent.com/DA2Botnet/QueryGenerator-Source/main/config_template/querygen_config.properties > querygen_config.properties");
+
+        }
+
+        my_config = PropertiesUtils.importConfig(properties_path); 
+
+        my_config.setProperty("log_ip", resolveDefaultLogIP());
+        my_config.setProperty("db_ip", resolveDefaultDBIP());
+
+        querySettings();
 
         // Start Logging
         Log.loadConfig(my_config, args);
@@ -68,12 +84,12 @@ public class Main {
 
         // Startup
         Log.sendSysMessage("Main: Starting.....\n");
-        Log.sendSysMessage(ConsoleBanners.otherBanner("/QueryGen/sys/rsc/banners/Rewards.txt", ConsoleBanners.EXTERNAL, ConsoleColors.CYAN_BOLD));
-        Log.sendSysMessage(ConsoleBanners.otherBanner("/QueryGen/sys/rsc/banners/QueryGen.txt", ConsoleBanners.EXTERNAL, ConsoleColors.YELLOW));
+        Log.sendSysMessage(ConsoleBanners.otherBanner(banners_directory + "Rewards.txt", ConsoleBanners.EXTERNAL, ConsoleColors.CYAN_BOLD));
+        Log.sendSysMessage(ConsoleBanners.otherBanner(banners_directory + "QueryGen.txt", ConsoleBanners.EXTERNAL, ConsoleColors.YELLOW));
         Log.sendSysMessage("\n\n\n");
 
         // Start logging client
-        Log.openClient(my_config.getProperty("log_ip", DEFAULT_DIRECTOR_IP));
+        Log.openClient(my_config.getProperty("log_ip", my_config.getProperty("log_ip")));
         Log.openConnector();
 
         // Request server setup
@@ -137,27 +153,52 @@ public class Main {
         */
     }
 
-    private static Properties querySettings() {
-        Properties my_config = new Properties();
-        String connectionURL = SQL.getConnectionURL("172.16.2.3", "BW_Main", "querygen", "Passw0rd!");
+    /**
+     * 
+     * @return
+     */
+
+    private static void querySettings() {
+        Properties my_new_config = new Properties();
+        String connectionURL = SQL.getConnectionURL(my_config.getProperty("db_ip"), "BW_Main", "querygen", "Passw0rd!");
 
         // TODO Implement other config        
 
         // Get ID
         int id = DA2SQLQueries.getID("QueryGenerators", connectionURL);
-        my_config.setProperty("id", id + "");
+        my_new_config.setProperty("id", id + "");
         
         // Get Request Port
-        my_config.setProperty("request_port", BWSQLQueries.getRequestPort(id, "QueryGenerators", connectionURL) + "");
+        my_new_config.setProperty("request_port", BWSQLQueries.getRequestPort(id, "QueryGenerators", connectionURL) + "");
 
         // Get Request Port
-        my_config.setProperty("receive_port", BWSQLQueries.getReceivePort(id, "QueryGenerators", connectionURL) + "");
+        my_new_config.setProperty("receive_port", BWSQLQueries.getReceivePort(id, "QueryGenerators", connectionURL) + "");
 
+        my_config = my_new_config;
+        PropertiesUtils.exportConfig(properties_path, my_config);
 
-        PropertiesUtils.exportConfig("config.properties", my_config);
-        return my_config;
+    }
 
+    /**
+     * 
+     * @return
+     */
 
+    private static String resolveDefaultDBIP() {
+        String my_ip = NetTools.getLocalIP();
+
+        return my_ip.substring(0, my_ip.lastIndexOf(".")) + 2;
+    }
+
+    /**
+     * 
+     * @return
+     */
+
+    private static String resolveDefaultLogIP() {
+        String my_ip = NetTools.getLocalIP();
+
+        return my_ip.substring(0, my_ip.lastIndexOf(".")) + 1;
     }
     
 }
