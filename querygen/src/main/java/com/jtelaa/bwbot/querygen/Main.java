@@ -68,6 +68,10 @@ public class Main {
             Log.sendManSysMessage("Loading config template");
             ComputerControl.sendCommand("cd ~/ && curl https://raw.githubusercontent.com/DA2Botnet/QueryGenerator-Source/main/config_template/querygen_config.properties > querygen_config.properties");
 
+            // Get searches
+            Log.sendManSysMessage("Loading searches");
+            ComputerControl.sendCommand("cd ~/ && svn checkout https://github.com/DA2Botnet/QueryGenerator-Source/trunk/searches");
+
         }
 
         my_config = PropertiesUtils.importConfig(properties_path); 

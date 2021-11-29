@@ -1,6 +1,7 @@
 package com.jtelaa.bwbot.querygen.searches;
 
 import java.util.Random;
+import java.io.File;
 import java.util.ArrayList;
 
 import com.jtelaa.bwbot.bwlib.Query;
@@ -25,7 +26,7 @@ public class SearchHandler {
     // TODO Make internal again
 
     /** Path of lists */
-    private static final String PATH = "/QueryGen/sys/rsc/searches/";
+    private static final String PATH = "~/searches/";
 
     /** Logging prefix */
     private static String log_prefix = "Search Handler: ";
@@ -100,81 +101,15 @@ public class SearchHandler {
     private synchronized static ArrayList<String> pickList() {
         // Get list
         Random rand = new Random();
-        String name = pickList(rand.nextInt(11));
+        ArrayList<File> files = FileUtil.getFiles(PATH);
+        File file = files.get(files.size()-1);
 
         // Read file
         // ArrayList<String> lines = FileUtil.listLinesInternalFile(name);
-        ArrayList<String> lines = FileUtil.listLinesFile(name);
-
-        // Show file is empty
-        if (lines.size() < 1) {
-
-            int i = -1;
-
-            do {
-                Log.sendMessage(log_prefix + "File " + name + " is empty");
-
-                i++;
-                // lines = FileUtil.listLinesInternalFile(pickList(i));
-                lines = FileUtil.listLinesFile(pickList(i));
-
-                if (i > 20) {
-                    Log.sendMessage(log_prefix + " All files empty (Will use list of default)");
-                    lines = ManualSearches.searches();
-
-                }
-
-            } while (lines.size() < 1);
-
-        }
+        ArrayList<String> lines = FileUtil.listLinesFile(file);
 
         // Return list + path
         return lines;
-
-    }
-
-    public synchronized static String pickList(int num) {
-        String name;
-
-        // Find random list
-        switch (num) {
-        case 1:
-            name = ("Searches2009.txt");
-            break;
-        case 2:
-            name = ("Searches2011.txt");
-            break;
-        case 3:
-            name = ("Searches2012.txt");
-            break;
-        case 4:
-            name = ("Searches2013.txt");
-            break;
-        case 5:
-            name = ("Searches2014.txt");
-            break;
-        case 6:
-            name = ("Searches2015.txt");
-            break;
-        case 7:
-            name = ("Searches2016.txt");
-            break;
-        case 8:
-            name = ("Searches2017.txt");
-            break;
-        case 9:
-            name = ("Searches2018.txt");
-            break;
-        case 10:
-            name = ("Searches2019.txt");
-            break;
-        default:
-            name = ("Searches2020.txt");
-            break;
-
-        }
-
-        return PATH + name;
 
     }
 
