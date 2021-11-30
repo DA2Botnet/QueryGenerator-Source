@@ -80,7 +80,7 @@ public class SearchHandler {
             String query_string = search_list.get(rand.nextInt(search_list.size() - 1)).toLowerCase();
             
             // Mangle
-            if (rand.nextInt(100) == 1) { query_string = mangle(query_string); }
+            if (rand.nextInt(20) == 1) { query_string = mangle(query_string); }
             
             // Add search
             searches[i] = new Query(query_string);
