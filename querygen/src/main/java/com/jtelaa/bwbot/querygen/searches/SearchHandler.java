@@ -122,31 +122,49 @@ public class SearchHandler {
      */
 
     public static String mangle(String query) {
-        Random random = new Random(42);
-        int num = random.nextInt(4);
+        Random random = new Random();
+        int num = random.nextInt(11);
 
         switch (num) {
-            case 0:
-                query = query.substring(1);
-                break;
-            case 1:
-                query = query.substring(0, query.length() - 2);
-                break;
-            case 3:
+            case 8:
                 query = query.toUpperCase();
                 break;
-            case 4:
+            case 1: // toggle case
                 String word = "";
-
                 for (int i = 0; i < query.length(); i++) {
                     if (i % 2 == 0) {
-                        word = word + query.substring(i, i + 1).toUpperCase();
+                        word.concat(query.substring(i, i + 1).toUpperCase());
                     } else {
-                        word = word + query.substring(i, i + 1).toLowerCase();
+                        word.concat(query.substring(i, i + 1).toLowerCase());
                     }
                 }
-
                 query = word;
+                break;
+            case 2: // random uppercase letter
+                String up = "";
+                for (int i = 0; i < query.length(); i++) {
+                    if (i % 2 == 0) {
+                        up.concat(query.substring(i, i + 1).toUpperCase());
+                    } else {
+                        up.concat(query.substring(i, i + 1).toLowerCase());
+                    }
+                }
+                query = up;
+                break;
+            case 3:
+                query = Typo.wrongKey(query);
+                break;
+            case 4:
+                query = Typo.missedChar(query);
+                break;
+            case 5:
+                query = Typo.transposedChar(query);
+                break;
+            case 6:
+                query = Typo.doubleChar(query);
+                break;
+            case 7:
+                query = Typo.bitFlip(query);
                 break;
 
         }
@@ -154,5 +172,4 @@ public class SearchHandler {
         return query;
 
     }
-
 }
