@@ -102,7 +102,7 @@ public class SearchHandler {
         // Get list
         Random rand = new Random();
         ArrayList<File> files = FileUtil.getFiles(PATH);
-        File file = files.get(files.size()-1);
+        File file = files.get(rand.nextInt(files.size()-1));
 
         // Read file
         // ArrayList<String> lines = FileUtil.listLinesInternalFile(name);
