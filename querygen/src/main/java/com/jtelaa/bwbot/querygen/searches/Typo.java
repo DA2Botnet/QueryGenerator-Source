@@ -31,9 +31,10 @@ public class Typo {
             keyboard.put(pairs[0], pairs[1]);            
         }
 
-        int index = r.nextInt(query.length());
+        do {int index = r.nextInt(query.length());
 
-        String c = Character.toString(query.charAt(index));
+        String c = Character.toString(query.charAt(index));d
+        }while (!c.equals("+"))
 
         String[] typos = keyboard.get(c).split(",");
 
