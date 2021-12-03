@@ -154,13 +154,13 @@ public class RemoteCLI extends LocalCLI {
 
         } else if (Cases.checkCase(cmd, new String[] {"title"})) {
             response += ConsoleColors.CLEAR.getEscape() + ConsoleColors.LINES.getEscape();
-            response += ConsoleBanners.otherBanner("com/jtelaa/bwbot/querygen/misc/Rewards.txt", ConsoleColors.CYAN_BOLD) + "\n";
-            response += ConsoleBanners.otherBanner("com/jtelaa/bwbot/querygen/misc/QueryGen.txt", ConsoleColors.YELLOW) + "\n";
+            response += ConsoleBanners.otherBanner("~banners/MainBanner.txt", ConsoleColors.CYAN_BOLD) + "\n";
+            response += ConsoleBanners.otherBanner("~banners/QueryGen.txt", ConsoleColors.YELLOW) + "\n";
             
         } else if (Cases.help(cmd)) {
             response += ConsoleColors.CLEAR.getEscape() + ConsoleColors.LINES.getEscape();
-            response += ConsoleBanners.otherBanner("com/jtelaa/bwbot/querygen/misc/Rewards.txt", ConsoleColors.CYAN_BOLD) + "\n";
-            response += ConsoleBanners.otherBanner("com/jtelaa/bwbot/querygen/misc/QueryGen.txt", ConsoleColors.YELLOW) + "\n";
+            response += ConsoleBanners.otherBanner("~banners/MainBanner.txt", ConsoleColors.CYAN_BOLD) + "\n";
+            response += ConsoleBanners.otherBanner("~banners/QueryGen.txt", ConsoleColors.YELLOW) + "\n";
 
             String help = (
                 "Query Generator CLI Help:\n"
