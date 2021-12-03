@@ -59,11 +59,8 @@ public class Main {
 
         // Load normally if not first time
         if (first_time) {
-            // Get banners
-            Log.sendManSysMessage("Loading banners");
-            ComputerControl.sendCommand("mkdir ~/banners/");
-            ComputerControl.sendCommand("cd ~/banners/ && curl https://raw.githubusercontent.com/DA2Botnet/DA2Botnet.github.io/main/banners/MainBanner.txt > MainBanner.txt");
-            ComputerControl.sendCommand("cd ~/banners/ && curl https://raw.githubusercontent.com/DA2Botnet/DA2Botnet.github.io/main/banners/QueryGen.txt > QueryGen.txt");
+            // Load banners
+            ConsoleBanners.loadRemoteBanners("QueryGen");
 
             // Get config template
             Log.sendManSysMessage("Loading config template");
