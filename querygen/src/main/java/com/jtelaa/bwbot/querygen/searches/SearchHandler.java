@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import com.jtelaa.bwbot.bwlib.Query;
+import com.jtelaa.da2.lib.control.ComputerControl;
 import com.jtelaa.da2.lib.files.FileUtil;
 import com.jtelaa.da2.lib.log.Log;
 
@@ -31,11 +32,35 @@ public class SearchHandler {
     /** Logging prefix */
     private static String log_prefix = "Search Handler: ";
 
+    /** File list */
+    public static volatile ArrayList<File> files;
+
+    /**
+     * Loads searches fromm the git repo
+     */
+
+    public static synchronized void loadRemoteSearches() {
+        // Get searches
+        Log.sendManSysMessage("Loading searches");
+        ComputerControl.sendCommand("cd ~/ && svn checkout https://github.com/DA2Botnet/QueryGenerator-Source/trunk/searches");
+        
+    }
+
+    /**
+     * Setup file list (run on init)
+     */
+
+    public static synchronized void setupFileList() {
+        files = FileUtil.getFiles(PATH);
+
+    }
+
     /**
      * Test that prints out searches
      * 
      * @param args Arguments
      */
+
     public static void main(String[] args) {
         while (true) {
             //System.out.println(Query.BING_URL + getRandomSearch());
@@ -101,10 +126,7 @@ public class SearchHandler {
     private synchronized static ArrayList<String> pickList() {
         // Get list
         Random rand = new Random();
-        ArrayList<File> files = FileUtil.getFiles(PATH);
         File file = files.get(rand.nextInt(files.size()-1));
-
-        // Read file
         // ArrayList<String> lines = FileUtil.listLinesInternalFile(name);
         ArrayList<String> lines = FileUtil.listLinesFile(file);
 
@@ -129,40 +151,54 @@ public class SearchHandler {
             case 8:
                 query = query.toUpperCase();
                 break;
+
             case 1: // toggle case
                 String word = "";
+
                 for (int i = 0; i < query.length(); i++) {
                     if (i % 2 == 0) {
                         word.concat(query.substring(i, i + 1).toUpperCase());
+
                     } else {
                         word.concat(query.substring(i, i + 1).toLowerCase());
+
                     }
                 }
+
                 query = word;
                 break;
+
             case 2: // random uppercase letter
                 String up = "";
+
                 for (int i = 0; i < query.length(); i++) {
                     if (i % 2 == 0) {
                         up.concat(query.substring(i, i + 1).toUpperCase());
+
                     } else {
                         up.concat(query.substring(i, i + 1).toLowerCase());
+
                     }
                 }
                 query = up;
                 break;
+
             case 3:
                 query = Typo.wrongKey(query);
                 break;
+
             case 4:
                 query = Typo.missedChar(query);
                 break;
+
             case 5:
                 query = Typo.transposedChar(query);
                 break;
+
             case 6:
                 query = Typo.doubleChar(query);
                 break;
+
             case 7:
                 query = Typo.bitFlip(query);
                 break;

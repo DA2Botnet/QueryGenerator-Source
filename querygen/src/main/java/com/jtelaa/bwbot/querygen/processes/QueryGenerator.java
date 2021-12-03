@@ -23,6 +23,16 @@ import com.jtelaa.da2.lib.log.Log;
 
 public class QueryGenerator extends Thread {
 
+    /**
+     * Program init
+     */
+
+    public QueryGenerator() {
+        // Sets up file list
+        SearchHandler.setupFileList();
+
+    }
+
     /** Query queue */
     public volatile static Queue<Query> query_queue;
 
@@ -31,6 +41,42 @@ public class QueryGenerator extends Thread {
 
     /** Maximum size of the query queu */
     public volatile static int MAX_QUERY_QUEUE_SIZE = 10000;
+
+    /** Boolean to control the receiver */
+    private boolean run = true;
+
+    /** Stops the command receiver */
+    public synchronized void stopGen() { run = false; }
+
+    /** Checks if the receier is ready */
+    public synchronized boolean generatorReady() { return run; }
+    
+    /**
+     * Generates a random search query
+     * 
+     * @return Random query
+     */
+
+    private Query generate() {
+        return SearchHandler.getRandomSearch();
+    }
+
+    /**
+     * Generates a list of random search queries
+     * 
+     * @param count Size of lisr
+     * 
+     * @return Array of searches
+     */
+
+    private Query[] generate(int count) {
+        return SearchHandler.getRandomSearches(count);
+
+    }
+
+    /**
+     * 
+     */
 
     public void run() {
         // Random
@@ -103,37 +149,4 @@ public class QueryGenerator extends Thread {
             }
         }
     }
-
-    /** Boolean to control the receiver */
-    private boolean run = true;
-
-    /** Stops the command receiver */
-    public synchronized void stopGen() { run = false; }
-
-    /** Checks if the receier is ready */
-    public synchronized boolean generatorReady() { return run; }
-    
-    /**
-     * Generates a random search query
-     * 
-     * @return Random query
-     */
-
-    private Query generate() {
-        return SearchHandler.getRandomSearch();
-    }
-
-    /**
-     * Generates a list of random search queries
-     * 
-     * @param count Size of lisr
-     * 
-     * @return Array of searches
-     */
-
-    private Query[] generate(int count) {
-        return SearchHandler.getRandomSearches(count);
-
-    }
-    
 }

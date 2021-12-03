@@ -6,6 +6,7 @@ import com.jtelaa.bwbot.bwlib.BWSQLQueries;
 import com.jtelaa.bwbot.querygen.processes.QueryGenerator;
 import com.jtelaa.bwbot.querygen.processes.QueryServer;
 import com.jtelaa.bwbot.querygen.processes.RequestServer;
+import com.jtelaa.bwbot.querygen.searches.SearchHandler;
 import com.jtelaa.bwbot.querygen.util.RemoteCLI;
 import com.jtelaa.bwbot.querygen.util.SysCLI;
 import com.jtelaa.da2.lib.config.PropertiesUtils;
@@ -68,9 +69,8 @@ public class Main {
             Log.sendManSysMessage("Loading config template");
             ComputerControl.sendCommand("cd ~/ && curl https://raw.githubusercontent.com/DA2Botnet/QueryGenerator-Source/main/config_template/querygen_config.properties > querygen_config.properties");
 
-            // Get searches
-            Log.sendManSysMessage("Loading searches");
-            ComputerControl.sendCommand("cd ~/ && svn checkout https://github.com/DA2Botnet/QueryGenerator-Source/trunk/searches");
+            // Load searches
+            SearchHandler.loadRemoteSearches();
 
         }
 
