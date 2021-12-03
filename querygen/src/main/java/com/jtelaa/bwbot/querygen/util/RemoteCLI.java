@@ -3,7 +3,7 @@ package com.jtelaa.bwbot.querygen.util;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
-import com.jtelaa.bwbot.querygen.Main;
+import com.jtelaa.bwbot.querygen.App;
 import com.jtelaa.bwbot.querygen.processes.QueryGenerator;
 import com.jtelaa.bwbot.querygen.processes.QueryServer;
 import com.jtelaa.da2.lib.bot.Bot;
@@ -25,7 +25,7 @@ public class RemoteCLI extends LocalCLI {
 
     @Override
     public void run() {
-        if (!run_as_local && Main.my_config.getProperty("remote_cli", "false").equalsIgnoreCase("true")) {
+        if (!run_as_local && App.my_config.getProperty("remote_cli", "false").equalsIgnoreCase("true")) {
             Log.sendMessage("CLI: Preparing Remote CLI");
 
             while (!run) {

@@ -5,7 +5,7 @@ import java.util.Queue;
 import java.util.Random;
 
 import com.jtelaa.bwbot.bwlib.Query;
-import com.jtelaa.bwbot.querygen.Main;
+import com.jtelaa.bwbot.querygen.App;
 import com.jtelaa.bwbot.querygen.searches.SearchHandler;
 import com.jtelaa.da2.lib.misc.MiscUtil;
 import com.jtelaa.da2.lib.console.ConsoleColors;
@@ -92,7 +92,7 @@ public class QueryGenerator extends Thread {
         Log.sendMessage(log_prefix + "Generator Wait Time Complete", ConsoleColors.GREEN_BRIGHT);
 
         // Max Query Size
-        MAX_QUERY_QUEUE_SIZE = Integer.parseInt(Main.my_config.getProperty("query_queue_size", "1000"));
+        MAX_QUERY_QUEUE_SIZE = Integer.parseInt(App.my_config.getProperty("query_queue_size", "1000"));
         Log.sendMessage(log_prefix + "Queue size set to " + MAX_QUERY_QUEUE_SIZE, ConsoleColors.PURPLE_BOLD_BRIGHT);
 
         // While running

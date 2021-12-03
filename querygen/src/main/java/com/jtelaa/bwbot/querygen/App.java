@@ -33,7 +33,7 @@ import com.jtelaa.da2.lib.sql.SQL;
 
  // TODO Find a way to include files in the jar
 
-public class Main {
+public class App {
     /** The remote cli local object */ 
     public static RemoteCLI rem_cli;
 

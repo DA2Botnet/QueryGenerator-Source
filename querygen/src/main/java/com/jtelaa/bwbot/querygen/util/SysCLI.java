@@ -2,7 +2,7 @@ package com.jtelaa.bwbot.querygen.util;
 
 import java.util.Scanner;
 
-import com.jtelaa.bwbot.querygen.Main;
+import com.jtelaa.bwbot.querygen.App;
 import com.jtelaa.da2.lib.cli.LocalCLI;
 import com.jtelaa.da2.lib.control.Command;
 import com.jtelaa.da2.lib.log.Log;
@@ -21,7 +21,7 @@ public class SysCLI extends LocalCLI {
     private Scanner keyboard;
 
     public SysCLI() {
-        if (Main.my_config.getProperty("local_cli", "true").equalsIgnoreCase("true")) {
+        if (App.my_config.getProperty("local_cli", "true").equalsIgnoreCase("true")) {
             // Use remote cli instance
             cli = new RemoteCLI(false);
 
@@ -41,7 +41,7 @@ public class SysCLI extends LocalCLI {
 
     @Override
     public void run() {
-        if (Main.my_config.getProperty("local_cli", "true").equalsIgnoreCase("true")) {
+        if (App.my_config.getProperty("local_cli", "true").equalsIgnoreCase("true")) {
             // Setup
             Log.sendSysMessage("Preparing Local CLI");
             String type;
