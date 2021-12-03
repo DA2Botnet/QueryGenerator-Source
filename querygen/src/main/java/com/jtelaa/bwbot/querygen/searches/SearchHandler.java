@@ -12,7 +12,7 @@ import com.jtelaa.da2.lib.log.Log;
 /**
  * Random search query generator
  * 
- * @since 2
+ * @since balls haha
  * @author Joseph
  * 
  * @see com.jtelaa.bwbot.bwlib.Query
