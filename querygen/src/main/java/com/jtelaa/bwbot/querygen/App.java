@@ -93,7 +93,7 @@ public class App {
 
         // Startup
         Log.sendSysMessage("Main: Starting.....\n");
-        Log.sendSysMessage(ConsoleBanners.otherBanner(banners_directory + "Rewards.txt", ConsoleBanners.EXTERNAL, ConsoleColors.CYAN_BOLD));
+        Log.sendSysMessage(ConsoleBanners.otherBanner(banners_directory + "MainBanner.txt", ConsoleBanners.EXTERNAL, ConsoleColors.CYAN_BOLD));
         Log.sendSysMessage(ConsoleBanners.otherBanner(banners_directory + "QueryGen.txt", ConsoleBanners.EXTERNAL, ConsoleColors.YELLOW));
         Log.sendSysMessage("\n\n\n");
 
