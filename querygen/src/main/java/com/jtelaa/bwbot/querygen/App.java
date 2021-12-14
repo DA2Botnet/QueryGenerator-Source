@@ -101,20 +101,7 @@ public class App {
         Log.openClient(my_config.getProperty("log_ip", my_config.getProperty("log_ip")));
         Log.openConnector();
 
-        // Request server setup
-        RequestServer req_srv = new RequestServer();
-        Log.sendMessage("Main: Starting request server", ConsoleColors.GREEN);
-        req_srv.start();
-        
-        // Query server setup
-        QueryServer qry_serv = new QueryServer();
-        Log.sendMessage("Main: Starting query server", ConsoleColors.GREEN);
-        qry_serv.start();
-
-        // Query generator setup
-        QueryGenerator qry_gen = new QueryGenerator();
-        Log.sendMessage("Main: Starting query generator", ConsoleColors.GREEN);
-        qry_gen.start();
+        // TODO connect thread manager
 
         // Done
         Log.sendMessage("Main: Done", ConsoleColors.GREEN);

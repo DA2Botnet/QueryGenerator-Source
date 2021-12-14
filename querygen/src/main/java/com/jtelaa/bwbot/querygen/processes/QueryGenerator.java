@@ -23,6 +23,8 @@ import com.jtelaa.da2.lib.log.Log;
 
 public class QueryGenerator extends Thread {
 
+    // ------------------------- Constructors
+
     /**
      * Program init
      */
@@ -30,26 +32,50 @@ public class QueryGenerator extends Thread {
     public QueryGenerator() {
         // Sets up file list
         SearchHandler.setupFileList();
+        log_prefix = std_log_prefix;
 
     }
+
+    /**
+     * Program init
+     * 
+     * @param log_prefix Log prefix (Contains ID)
+     */
+
+    public QueryGenerator(String log_prefix) {
+        this.log_prefix = log_prefix;
+        SearchHandler.setupFileList();
+
+    }
+
+    // ------------------------- Logging
+
+    /** Logging prefix */
+    private String log_prefix;
+
+    /** Standard logging prefix */
+    public volatile static String std_log_prefix = "Query Generator:";
+
+    // ------------------------- Generation Settings Control
 
     /** Query queue */
     public volatile static Queue<Query> query_queue;
 
-    /** */
-    private static String log_prefix = "Query Generator: ";
-
     /** Maximum size of the query queu */
     public volatile static int MAX_QUERY_QUEUE_SIZE = 10000;
 
-    /** Boolean to control the receiver */
+    // ------------------------- Thread Control
+
+    /** Boolean to control the thread */
     private boolean run = true;
 
-    /** Stops the command receiver */
+    /** Stops the thread */
     public synchronized void stopGen() { run = false; }
 
-    /** Checks if the receier is ready */
+    /** Checks if the thread is ready */
     public synchronized boolean generatorReady() { return run; }
+
+    // ------------------------- Query Generation Collection
     
     /**
      * Generates a random search query
@@ -74,8 +100,10 @@ public class QueryGenerator extends Thread {
 
     }
 
+    // ------------------------- Thread Processes
+
     /**
-     * 
+     * Run the thread
      */
 
     public void run() {
@@ -132,20 +160,6 @@ public class QueryGenerator extends Thread {
                     MiscUtil.waitamoment(10000);
 
                 }
-
-                /*
-
-                Log.sendSysMessage(log_prefix + "Reading 10 Example Queries");
-
-                for (int i = 0; i < 10; i ++) {
-                    Log.sendSysMessage(log_prefix + query_queue.poll());
-
-                }
-
-                Log.sendSysMessage(log_prefix + "Done with examples");
-
-                */
-
             }
         }
     }

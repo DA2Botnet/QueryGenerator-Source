@@ -22,13 +22,55 @@ import com.jtelaa.da2.lib.net.server.ServerUDP;
 
 public class RequestServer extends Thread {
 
+    // ------------------------- Constructors
+
+    /**
+     * Program init
+     */
+
+    public RequestServer() {
+        log_prefix = std_log_prefix;
+
+    }
+
+    /**
+     * Program init
+     * 
+     * @param log_prefix Log prefix (Contains ID)
+     */
+
+    public RequestServer(String log_prefix) {
+        this.log_prefix = log_prefix;
+
+    }
+
+    // ------------------------- Logging
+
+    /** Logging prefix */
+    private String log_prefix;
+
+    /** Standard logging prefix */
+    public volatile static String std_log_prefix = "Request Server:";
+
+    // ------------------------- Thread Control
+
+    /** Boolean to control the thread */
+    private boolean run = true;
+
+    /** Stops the thread */
+    public synchronized void stopServer() { run = false; }
+
+    /** Checks if the thread is ready */
+    public synchronized boolean serverReady() { return run; }
+
+    // ------------------------- Thread Processes
+
     public void run() {
         // Setup server
-        ServerUDP server = new ServerUDP(BWPorts.QUERY_REQUEST.checkForPreset(App.my_config, "request_port"), "Query Request Server: ", ConsoleColors.GREEN);
+        ServerUDP server = new ServerUDP(BWPorts.QUERY_REQUEST.checkForPreset(App.my_config, "request_port"), log_prefix, ConsoleColors.GREEN);
         
         // Bot address var
         String bot_address;
-
         // If server is ready
         if (server.startServer()) {
             while (run) {
@@ -40,16 +82,16 @@ public class RequestServer extends Thread {
                         bot_address = server.getClientAddress();
 
                         QueryServer.addBot(new Bot(bot_address));
-                        Log.sendMessage("Request Server: Request from " + bot_address, ConsoleColors.YELLOW);
+                        Log.sendMessage(log_prefix + "Request Server: Request from " + bot_address, ConsoleColors.YELLOW);
                 
                     } else {
-                        Log.sendMessage("Request Server: Invalid Request", ConsoleColors.YELLOW);
+                        Log.sendMessage(log_prefix + "Request Server: Invalid Request", ConsoleColors.YELLOW);
 
                     }
 
                 // Error handling
                 } catch (Exception e) {
-                    Log.sendMessage("Request Server: Could not resolve requesting bot's IP", ConsoleColors.RED);
+                    Log.sendMessage(log_prefix + "Request Server: Could not resolve requesting bot's IP", ConsoleColors.RED);
                     MiscUtil.waitasec(.1);
 
                 }
@@ -61,14 +103,5 @@ public class RequestServer extends Thread {
 
         }
     }
-
-    /** Boolean to control the receiver */
-    private boolean run = true;
-
-    /** Stops the command receiver */
-    public synchronized void stopServer() { run = false; }
-
-    /** Checks if the receier is ready */
-    public synchronized boolean serverReady() { return run; }
     
 }

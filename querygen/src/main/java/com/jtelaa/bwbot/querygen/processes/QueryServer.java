@@ -5,13 +5,13 @@ import java.util.Queue;
 
 import com.jtelaa.bwbot.bwlib.BWPorts;
 import com.jtelaa.bwbot.bwlib.Query;
-import com.jtelaa.bwbot.querygen.App;
 import com.jtelaa.da2.lib.bot.Bot;
 import com.jtelaa.da2.lib.console.ConsoleColors;
 import com.jtelaa.da2.lib.log.Log;
 import com.jtelaa.da2.lib.misc.MiscUtil;
 import com.jtelaa.da2.lib.net.NetTools;
 import com.jtelaa.da2.lib.net.client.ClientUDP;
+import com.jtelaa.da2.lib.net.ports.ManualPort;
 
 /**
  * This process serves the requested queries
@@ -25,14 +25,139 @@ import com.jtelaa.da2.lib.net.client.ClientUDP;
 
 public class QueryServer extends Thread {
     
-    /** */
-    private static String log_prefix = "Query Server: ";
+    // ------------------------- Constructors
+
+    /**
+     * Program init
+     */
+
+    public QueryServer() {
+        log_prefix = std_log_prefix;
+        receive_port = BWPorts.QUERY_RECEIVE.getPort();
+
+    }
+    
+    /**
+     * Program init
+     * 
+     * @param receive_port Receive port
+     */
+
+    public QueryServer(int receive_port) {
+        log_prefix = std_log_prefix;
+        this.receive_port = receive_port;
+
+    }
+
+    /**
+     * Program init
+     * 
+     * @param log_prefix Log prefix (Contains ID)
+     */
+
+    public QueryServer(String log_prefix) {
+        this.log_prefix = log_prefix;
+        receive_port = BWPorts.QUERY_RECEIVE.getPort();
+
+    }
+
+    /**
+     * Program init
+     * 
+     * @param log_prefix Log prefix (Contains ID)
+     * @param receive_port Receive port
+     */
+
+    public QueryServer(String log_prefix, int receive_port) {
+        this.log_prefix = log_prefix;
+        this.receive_port = receive_port;
+
+    }
+
+    // ------------------------- Logging
+
+    /** Logging prefix */
+    private String log_prefix;
+
+    /** Standard logging prefix */
+    public volatile static String std_log_prefix = "Query Server:";
+
+    // ------------------------- Thread Control
+
+    /** Boolean to control the thread */
+    private boolean run = true;
+
+    /** Stops the thread */
+    public synchronized void stopServer() { run = false; }
+
+    /** Checks if the thread is ready */
+    public synchronized boolean serverReady() { return run; }
+
+    // ------------------------- Queue
 
     /** Bot queue */
     public volatile static Queue<Bot> bot_queue;
 
+    // ------------------------- Socket
+
     /** UDP Client  */
-    private ClientUDP cmd_tx;
+    private ClientUDP query_socket;
+
+    /** */
+    private int receive_port;
+
+    // ------------------------- Thread Processes
+
+    /**
+     * 
+     */
+
+    public void run() {
+        // Ready
+        Log.sendMessage("Query Server: Ready", ConsoleColors.GREEN);
+
+        // Setup lists
+        bot_queue = new LinkedList<>();
+
+        // Constantly fill requests
+        while (run) {
+            fillRequest();
+        }
+    }
+
+    // ------------------------- Request Filler
+
+    /**
+     * Fills the search query request by establishing a connection
+     * with the bot
+     */
+
+    private void fillRequest() {
+        // If no requests or queries, wait
+        if (bot_queue.size() == 0 || QueryGenerator.query_queue.size() == 0) {
+            MiscUtil.waitasec(.10);
+            return;
+
+        } 
+
+        // Pick top off queue
+        Query query_to_send = QueryGenerator.query_queue.poll();
+        Bot bot_to_serve = bot_queue.poll();
+
+        // Notification
+        Log.sendMessage(log_prefix + "Serving " + bot_to_serve.ip, ConsoleColors.YELLOW);
+
+        // Setup client
+        query_socket = new ClientUDP(bot_to_serve.ip, new ManualPort(receive_port), log_prefix, ConsoleColors.YELLOW);
+
+        // Send and then close
+        if (query_socket.startClient()) {
+            query_socket.sendMessage(query_to_send.getQuery());
+            query_socket.closeClient();
+            Log.sendMessage(log_prefix + "Done serving " + bot_to_serve.ip, ConsoleColors.YELLOW);
+
+        }
+    }
 
     /**
      * Adds a query into the queue <p>
@@ -77,58 +202,4 @@ public class QueryServer extends Thread {
 
         }
     }
-
-    public void run() {
-        // Ready
-        Log.sendMessage("Query Server: Ready", ConsoleColors.GREEN);
-
-        // Setup lists
-        bot_queue = new LinkedList<>();
-
-        // Constantly fill requests
-        while (run) {
-            fillRequest();
-        }
-    }
-
-    /** Boolean to control the receiver */
-    private boolean run = true;
-
-    /** Stops the command receiver */
-    public synchronized void stopReceiver() { run = false; }
-
-    /** Checks if the receier is ready */
-    public synchronized boolean receiverReady() { return run; }
-
-    /**
-     * Fills the search query request by establishing a connection
-     * with the bot
-     */
-
-    private void fillRequest() {
-        // If no requests or queries, wait
-        if (bot_queue.size() == 0 || QueryGenerator.query_queue.size() == 0) {
-            MiscUtil.waitasec(.10);
-            return;
-        } 
-
-        // Pick top off queue
-        Query query_to_send = QueryGenerator.query_queue.poll();
-        Bot bot_to_serve = bot_queue.poll();
-
-        // Notification
-        Log.sendMessage(log_prefix + "Serving " + bot_to_serve.ip, ConsoleColors.YELLOW);
-
-        // Setup client
-        cmd_tx = new ClientUDP(bot_to_serve.ip, BWPorts.QUERY_RECEIVE.checkForPreset(App.my_config, "receive_port"), log_prefix, ConsoleColors.YELLOW);
-
-        // Send and then close
-        if (cmd_tx.startClient()) {
-            cmd_tx.sendMessage(query_to_send.getQuery());
-            cmd_tx.closeClient();
-            Log.sendMessage(log_prefix + "Done serving " + bot_to_serve.ip, ConsoleColors.YELLOW);
-
-        }
-    }
-    
 }

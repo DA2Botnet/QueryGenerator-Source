@@ -1,77 +1,43 @@
 {
-    "interface_count": 4,
+    "request_server": {
+        "interface_count": 1,
 
-    "interfaces": {
-        "interface1": {
-            "name": "ens160",
-            "dedicated_thread": true,
+        "interfaces": {
+            "interface1": {
+                "name": "ens160",
 
-            "ip_addrs": [
-                "172.16.1.6",
-                "172.16.1.7"
+                "ip_addresses": [
+                    "172.16.10.1"
 
-            ],
+                ],
 
-            "serving_ports": [
-                9998,
-                9997,
-                9996
+                "ports": [
+                    9998
 
-            ]
-        },
+                ]
+            }
 
-        "interface2": {
-            "name": "ens160",
-            "dedicated_thread": true,
-
-            "ip_addrs": [
-                "172.16.1.6",
-                "172.16.1.7"
-
-            ],
-
-            "serving_ports": [
-                9998,
-                9997,
-                9996
-
-            ]
-        },
-
-        "interface3": {
-            "name": "ens160",
-            "dedicated_thread": true,
-
-            "ip_addrs": [
-                "172.16.1.6",
-                "172.16.1.7"
-
-            ],
-
-            "serving_ports": [
-                9998,
-                9997,
-                9996
-
-            ]
-        },
-
-        "interface4": {
-            "name": "ens160",
-            "dedicated_thread": true,
-
-            "ip_addrs": [
-                "172.16.1.6",
-                "172.16.1.7"
-
-            ],
-
-            "serving_ports": [
-                9998,
-                9997,
-                9996
-
-            ]
         }
+    },
+
+    "query_server": {
+        "interface_count": 4,
+
+        "interfaces": {
+            "interface1": {
+                "name": "ens160",
+
+                "ip_addresses": [
+                    "172.16.10.1"
+
+                ],
+
+                "ports": [
+                    9998
+
+                ]
+            }
+        }
+
     }
 }
