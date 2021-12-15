@@ -1,0 +1,38 @@
+{
+    "request_server": {
+        "interface_count": 1,
+
+        "interfaces": {
+            "interface1": {
+                "interface_name": "ens160",
+                "thread_count": 1,
+
+                "ip_addresse": "172.16.10.1",
+
+                "port": 9998
+            }
+
+        }
+    },
+
+    "query_server": {
+        "interface_count": 4,
+
+        "interfaces": {
+            "interface1": {
+                "interface_name": "ens160",
+                "thread_count": 1,
+
+                "ip_addresses": "172.16.10.1",
+
+                "ports": 9998
+            }
+        }
+
+    },
+
+    "query_generator": {
+        "generator_count": 1
+
+    }
+}
