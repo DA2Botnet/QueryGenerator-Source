@@ -2,10 +2,7 @@ package com.jtelaa.bwbot.querygen;
 
 import java.util.Properties;
 
-import com.jtelaa.bwbot.bwlib.BWSQLQueries;
-import com.jtelaa.bwbot.querygen.processes.QueryGenerator;
-import com.jtelaa.bwbot.querygen.processes.QueryServer;
-import com.jtelaa.bwbot.querygen.processes.RequestServer;
+import com.jtelaa.bwbot.querygen.processes.ThreadManager;
 import com.jtelaa.bwbot.querygen.searches.SearchHandler;
 import com.jtelaa.bwbot.querygen.util.RemoteCLI;
 import com.jtelaa.bwbot.querygen.util.SysCLI;
@@ -66,6 +63,10 @@ public class App {
             Log.sendManSysMessage("Loading config template");
             ComputerControl.sendCommand("cd ~/ && curl https://raw.githubusercontent.com/DA2Botnet/QueryGenerator-Source/main/config_template/querygen_config.properties > querygen_config.properties");
 
+            // Get thread config template
+            Log.sendManSysMessage("Loading thread config template");
+            ComputerControl.sendCommand("cd ~/ && curl https://raw.githubusercontent.com/DA2Botnet/QueryGenerator-Source/main/config_template/thread_config.jsom > thread_config.json");
+
             // Load searches
             SearchHandler.loadRemoteSearches();
 
@@ -101,7 +102,14 @@ public class App {
         Log.openClient(my_config.getProperty("log_ip", my_config.getProperty("log_ip")));
         Log.openConnector();
 
-        // TODO connect thread manager
+        try {
+            ThreadManager.setupProcesses("~/thread_config.json");
+
+        } catch (Exception e) {
+            Log.sendMessage("Main: ", e, ConsoleColors.RED);
+            System.exit(0);
+
+        }
 
         // Done
         Log.sendMessage("Main: Done", ConsoleColors.GREEN);
