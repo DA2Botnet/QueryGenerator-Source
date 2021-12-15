@@ -3,6 +3,7 @@
 
 # VS CODE
 .vscode/
+.VSCodeCounter/
 
 # Compiled class file
 *.class
