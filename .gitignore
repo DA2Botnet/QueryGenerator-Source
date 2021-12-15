@@ -5,6 +5,9 @@
 .vscode/
 .VSCodeCounter/
 
+# IntelliJ
+.idea/
+
 # Compiled class file
 *.class
 
