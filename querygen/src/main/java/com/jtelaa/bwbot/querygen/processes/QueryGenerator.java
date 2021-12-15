@@ -7,6 +7,7 @@ import java.util.Random;
 import com.jtelaa.bwbot.bwlib.Query;
 import com.jtelaa.bwbot.querygen.App;
 import com.jtelaa.bwbot.querygen.searches.SearchHandler;
+import com.jtelaa.bwbot.querygen.util.GenericThread;
 import com.jtelaa.da2.lib.misc.MiscUtil;
 import com.jtelaa.da2.lib.console.ConsoleColors;
 import com.jtelaa.da2.lib.log.Log;
@@ -21,7 +22,7 @@ import com.jtelaa.da2.lib.log.Log;
  * @see com.jtelaa.bwbot.querygen.processes.RequestServer
  */
 
-public class QueryGenerator extends Thread {
+public class QueryGenerator extends GenericThread {
 
     // ------------------------- Constructors
 
@@ -48,6 +49,14 @@ public class QueryGenerator extends Thread {
 
     }
 
+    // ------------------------- Thread Control
+
+    /** Stops the thread */
+    public synchronized void stopGenerator() { run = false; }
+
+    /** Checks if the thread is ready */
+    public synchronized boolean generatorReady() { return run; }
+
     // ------------------------- Logging
 
     /** Logging prefix */
@@ -63,17 +72,6 @@ public class QueryGenerator extends Thread {
 
     /** Maximum size of the query queu */
     public volatile static int MAX_QUERY_QUEUE_SIZE = 10000;
-
-    // ------------------------- Thread Control
-
-    /** Boolean to control the thread */
-    private boolean run = true;
-
-    /** Stops the thread */
-    public synchronized void stopGen() { run = false; }
-
-    /** Checks if the thread is ready */
-    public synchronized boolean generatorReady() { return run; }
 
     // ------------------------- Query Generation Collection
     
@@ -162,5 +160,8 @@ public class QueryGenerator extends Thread {
                 }
             }
         }
+
+        Log.sendMessage(log_prefix + "Generator Process Stopped!");
+        
     }
 }

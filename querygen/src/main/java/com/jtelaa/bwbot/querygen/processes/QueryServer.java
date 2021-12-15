@@ -5,6 +5,7 @@ import java.util.Queue;
 
 import com.jtelaa.bwbot.bwlib.BWPorts;
 import com.jtelaa.bwbot.bwlib.Query;
+import com.jtelaa.bwbot.querygen.util.GenericThread;
 import com.jtelaa.da2.lib.bot.Bot;
 import com.jtelaa.da2.lib.console.ConsoleColors;
 import com.jtelaa.da2.lib.log.Log;
@@ -23,7 +24,7 @@ import com.jtelaa.da2.lib.net.ports.ManualPort;
  * @see com.jtelaa.bwbot.querygen.processes.QueryGenerator
  */
 
-public class QueryServer extends Thread {
+public class QueryServer extends GenericThread {
     
     // ------------------------- Constructors
 
@@ -82,17 +83,6 @@ public class QueryServer extends Thread {
     /** Standard logging prefix */
     public volatile static String std_log_prefix = "Query Server:";
 
-    // ------------------------- Thread Control
-
-    /** Boolean to control the thread */
-    private boolean run = true;
-
-    /** Stops the thread */
-    public synchronized void stopServer() { run = false; }
-
-    /** Checks if the thread is ready */
-    public synchronized boolean serverReady() { return run; }
-
     // ------------------------- Queue
 
     /** Bot queue */
@@ -105,6 +95,14 @@ public class QueryServer extends Thread {
 
     /** */
     private int receive_port;
+
+    // ------------------------- Thread Control
+
+    /** Stops the thread */
+    public synchronized void stopServer() { run = false; }
+
+    /** Checks if the thread is ready */
+    public synchronized boolean serverReady() { return run; }
 
     // ------------------------- Thread Processes
 
@@ -123,6 +121,8 @@ public class QueryServer extends Thread {
         while (run) {
             fillRequest();
         }
+
+        Log.sendMessage(log_prefix + "Query Server Process Stopped!");
     }
 
     // ------------------------- Request Filler

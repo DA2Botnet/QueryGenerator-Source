@@ -3,6 +3,7 @@ package com.jtelaa.bwbot.querygen.processes;
 import com.jtelaa.bwbot.bwlib.BWMessages;
 import com.jtelaa.bwbot.bwlib.BWPorts;
 import com.jtelaa.bwbot.querygen.App;
+import com.jtelaa.bwbot.querygen.util.GenericThread;
 import com.jtelaa.da2.lib.bot.Bot;
 import com.jtelaa.da2.lib.console.ConsoleColors;
 import com.jtelaa.da2.lib.log.Log;
@@ -20,7 +21,7 @@ import com.jtelaa.da2.lib.net.server.ServerUDP;
  * @see com.jtelaa.da2.querygen.QueryGenerator.java
  */
 
-public class RequestServer extends Thread {
+public class RequestServer extends GenericThread {
 
     // ------------------------- Constructors
 
@@ -44,6 +45,14 @@ public class RequestServer extends Thread {
 
     }
 
+    // ------------------------- Thread Control
+
+    /** Stops the thread */
+    public synchronized void stopServer() { run = false; }
+
+    /** Checks if the thread is ready */
+    public synchronized boolean serverReady() { return run; }
+
     // ------------------------- Logging
 
     /** Logging prefix */
@@ -51,17 +60,6 @@ public class RequestServer extends Thread {
 
     /** Standard logging prefix */
     public volatile static String std_log_prefix = "Request Server:";
-
-    // ------------------------- Thread Control
-
-    /** Boolean to control the thread */
-    private boolean run = true;
-
-    /** Stops the thread */
-    public synchronized void stopServer() { run = false; }
-
-    /** Checks if the thread is ready */
-    public synchronized boolean serverReady() { return run; }
 
     // ------------------------- Thread Processes
 
@@ -102,6 +100,8 @@ public class RequestServer extends Thread {
             run = false;
 
         }
+
+        Log.sendMessage(log_prefix + "Request Server Process Stopped!");
+        
     }
-    
 }
