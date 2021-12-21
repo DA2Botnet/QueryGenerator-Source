@@ -63,6 +63,10 @@ public class RequestServer extends GenericThread {
 
     // ------------------------- Thread Processes
 
+    /**
+     * Thread code
+     */
+
     public void run() {
         // Setup server
         ServerUDP server = new ServerUDP(BWPorts.QUERY_REQUEST.checkForPreset(App.my_config, "request_port"), log_prefix, ConsoleColors.GREEN);
@@ -76,12 +80,14 @@ public class RequestServer extends GenericThread {
                 String response = server.getMessage();
 
                 try {
+                    // If message is a request
                     if (response.contains(BWMessages.QUERY_REQUEST_MESSAGE.getMessage())) {
                         bot_address = server.getClientAddress();
 
                         QueryServer.addBot(new Bot(bot_address));
                         Log.sendMessage(log_prefix + "Request Server: Request from " + bot_address, ConsoleColors.YELLOW);
                 
+                    // If the message does not contain a request
                     } else {
                         Log.sendMessage(log_prefix + "Request Server: Invalid Request", ConsoleColors.YELLOW);
 
@@ -101,6 +107,7 @@ public class RequestServer extends GenericThread {
 
         }
 
+        // Exit
         Log.sendMessage(log_prefix + "Request Server Process Stopped!");
         
     }

@@ -107,12 +107,12 @@ public class QueryServer extends GenericThread {
     // ------------------------- Thread Processes
 
     /**
-     * 
+     * Thread codes
      */
 
     public void run() {
         // Ready
-        Log.sendMessage("Query Server: Ready", ConsoleColors.GREEN);
+        Log.sendMessage("Query Server: Running", ConsoleColors.GREEN);
 
         // Setup lists
         bot_queue = new LinkedList<>();
@@ -122,6 +122,7 @@ public class QueryServer extends GenericThread {
             fillRequest();
         }
 
+        // Exit
         Log.sendMessage(log_prefix + "Query Server Process Stopped!");
     }
 

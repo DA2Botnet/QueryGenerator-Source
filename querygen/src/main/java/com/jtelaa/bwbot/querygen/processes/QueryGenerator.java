@@ -13,13 +13,15 @@ import com.jtelaa.da2.lib.console.ConsoleColors;
 import com.jtelaa.da2.lib.log.Log;
 
 /**
- * This process generates random search queries to be searched by clients
+ * This process generates random search queries to be searched by clients.
+ * Uses the SearchHandler to generate and randomize the searches
  * 
  * @since 2
  * @author Joseph
  * 
  * @see com.jtelaa.bwbot.querygen.processes.QueryServer
  * @see com.jtelaa.bwbot.querygen.processes.RequestServer
+ * @see com.jtelaa.bwbot.querygen.searches.SearchHandler
  */
 
 public class QueryGenerator extends GenericThread {
@@ -98,19 +100,18 @@ public class QueryGenerator extends GenericThread {
 
     }
 
-    // ------------------------- Thread Processes
+    // ------------------------- Util
 
     /**
-     * Run the thread
+     * Startup sequence and logging
      */
 
-    public void run() {
-        // Random
-        Random rand = new Random();
+    private void startup() {
+        // Set empty queue
         query_queue = new LinkedList<>();
-        int rng;
 
         // Wait
+        Log.sendMessage(log_prefix + "Waiting until other threads begin!", ConsoleColors.GREEN_BRIGHT);
         Log.sendMessage(log_prefix + "Generator Wait 30s", ConsoleColors.GREEN_BRIGHT);
         MiscUtil.waitasec(15);
         Log.sendMessage(log_prefix + "Generator Wait 15s", ConsoleColors.GREEN_BRIGHT);
@@ -120,6 +121,22 @@ public class QueryGenerator extends GenericThread {
         // Max Query Size
         MAX_QUERY_QUEUE_SIZE = Integer.parseInt(App.my_config.getProperty("query_queue_size", "1000"));
         Log.sendMessage(log_prefix + "Queue size set to " + MAX_QUERY_QUEUE_SIZE, ConsoleColors.PURPLE_BOLD_BRIGHT);
+
+    }
+
+    // ------------------------- Thread Processes
+
+    /**
+     * Run the thread
+     */
+
+    public void run() {
+        // Startup
+        startup();
+
+        // Random
+        Random rand = new Random();
+        int rng;
 
         // While running
         run = true;
@@ -135,6 +152,7 @@ public class QueryGenerator extends GenericThread {
                     query_queue.add(generate());
 
                 } else {
+                    // Rng number of queries
                     int count = rand.nextInt(rng);
 
                     // Generate random query
@@ -161,6 +179,7 @@ public class QueryGenerator extends GenericThread {
             }
         }
 
+        // Exit
         Log.sendMessage(log_prefix + "Generator Process Stopped!");
         
     }

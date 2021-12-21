@@ -12,8 +12,9 @@ import com.jtelaa.da2.lib.log.Log;
 /**
  * Random search query generator
  * 
- * @since balls haha
+ * @since 2
  * @author Joseph
+ * @author Benjamin
  * 
  * @see com.jtelaa.bwbot.bwlib.Query
  * @see com.jtelaa.bwbot.querygen.processes.QueryGenerator
@@ -41,7 +42,7 @@ public class SearchHandler {
 
     public static synchronized void loadRemoteSearches() {
         // Get searches
-        Log.sendManSysMessage("Loading searches");
+        Log.sendManSysMessage(log_prefix + "Loading searches");
         ComputerControl.sendCommand("cd ~/ && svn checkout https://github.com/DA2Botnet/QueryGenerator-Source/trunk/searches");
         
     }
@@ -76,11 +77,9 @@ public class SearchHandler {
      */
 
     public synchronized static Query getRandomSearch() {
-        Random rand = new Random();
-
         // Generate an array and pick at a random index
         Query[] searches = getRandomSearches(100);
-        return searches[rand.nextInt(searches.length - 1)];
+        return searches[new Random().nextInt(searches.length - 1)];
 
     }
 
@@ -125,9 +124,7 @@ public class SearchHandler {
 
     private synchronized static ArrayList<String> pickList() {
         // Get list
-        Random rand = new Random();
-        File file = files.get(rand.nextInt(files.size()-1));
-        // ArrayList<String> lines = FileUtil.listLinesInternalFile(name);
+        File file = files.get(new Random().nextInt(files.size()-1));
         ArrayList<String> lines = FileUtil.listLinesFile(file);
 
         // Return list + path
@@ -144,15 +141,17 @@ public class SearchHandler {
      */
 
     public static String mangle(String query) {
-        Random random = new Random();
-        int num = random.nextInt(11);
+        // Pick case
+        int num = new Random().nextInt(11);
 
         switch (num) {
+            // All upper case
             case 8:
                 query = query.toUpperCase();
                 break;
 
-            case 1: // toggle case
+            // Toggle case
+            case 1: 
                 String word = "";
 
                 for (int i = 0; i < query.length(); i++) {
@@ -168,7 +167,8 @@ public class SearchHandler {
                 query = word;
                 break;
 
-            case 2: // random uppercase letter
+            // Random uppercase letter
+            case 2: 
                 String up = "";
 
                 for (int i = 0; i < query.length(); i++) {
@@ -183,28 +183,34 @@ public class SearchHandler {
                 query = up;
                 break;
 
+            // Adjacent letter
             case 3:
                 query = Typo.wrongKey(query);
                 break;
 
+            // Remove character
             case 4:
                 query = Typo.missedChar(query);
                 break;
 
+            // Character Swap
             case 5:
                 query = Typo.transposedChar(query);
                 break;
 
+            // Double characteer
             case 6:
                 query = Typo.doubleChar(query);
                 break;
 
+            // Bit flip
             case 7:
                 query = Typo.bitFlip(query);
                 break;
 
         }
 
+        // Return
         return query;
 
     }

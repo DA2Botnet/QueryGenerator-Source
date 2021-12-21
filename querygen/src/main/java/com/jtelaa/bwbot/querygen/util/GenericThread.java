@@ -1,5 +1,11 @@
 package com.jtelaa.bwbot.querygen.util;
 
+/**
+ * Abstractionn for the threads/processes in this application.
+ * 
+ * @author Joseph
+ */
+
 public class GenericThread extends Thread {
 
     // ------------------------- Thread Control
