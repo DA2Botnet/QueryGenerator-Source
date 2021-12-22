@@ -98,16 +98,33 @@ public class RemoteCLI extends LocalCLI {
         
     }
 
+    /**
+     * 
+     * @return
+     */
+
     private String shutdown() {
         run = false;
         return "Shutting Down CLI";
 
     }
 
+    /**
+     * 
+     * @param command
+     * 
+     * @return
+     */
+
     private String cmd(Command command) {
         return ComputerControl.sendCommand(command.addBlankUser().addBlankControlID().modifyforSys());
 
     }
+
+    /**
+     * 
+     * @return
+     */
 
     private String title() {
         String response = "";
@@ -117,6 +134,11 @@ public class RemoteCLI extends LocalCLI {
         return response;
 
     }
+
+    /**
+     * 
+     * @return
+     */
 
     private String help() {
         String response = "";
@@ -136,6 +158,13 @@ public class RemoteCLI extends LocalCLI {
         return response;
 
     }
+
+    /**
+     * 
+     * @param commands
+     * 
+     * @return
+     */
 
     private String size(Command[] commands) {
         String response = "";
@@ -255,6 +284,13 @@ public class RemoteCLI extends LocalCLI {
         return response;
 
     }
+
+    /**
+     * 
+     * @param commands
+     * 
+     * @return
+     */
 
     private String dump(Command[] commands) {
         String response = "Dumping Query Queue\n";
