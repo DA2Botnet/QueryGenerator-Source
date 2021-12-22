@@ -2,6 +2,7 @@ package com.jtelaa.bwbot.querygen.processes;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
 
 import com.jtelaa.bwbot.bwlib.BWPorts;
 import com.jtelaa.bwbot.bwlib.Query;
@@ -12,7 +13,7 @@ import com.jtelaa.da2.lib.log.Log;
 import com.jtelaa.da2.lib.misc.MiscUtil;
 import com.jtelaa.da2.lib.net.NetTools;
 import com.jtelaa.da2.lib.net.client.ClientUDP;
-import com.jtelaa.da2.lib.net.ports.ManualPort;
+import com.jtelaa.da2.lib.net.ports.Ports;
 
 /**
  * This process serves the requested queries
@@ -34,7 +35,10 @@ public class QueryServer extends GenericThread {
 
     public QueryServer() {
         log_prefix = std_log_prefix;
-        receive_port = BWPorts.QUERY_RECEIVE.getPort();
+        this.setName(log_prefix);
+        log_prefix += ": ";
+
+        receive_port = BWPorts.QUERY_RECEIVE;
 
     }
     
@@ -44,8 +48,11 @@ public class QueryServer extends GenericThread {
      * @param receive_port Receive port
      */
 
-    public QueryServer(int receive_port) {
+    public QueryServer(Ports receive_port) {
         log_prefix = std_log_prefix;
+        this.setName(log_prefix);
+        log_prefix += ": ";
+
         this.receive_port = receive_port;
 
     }
@@ -53,24 +60,30 @@ public class QueryServer extends GenericThread {
     /**
      * Program init
      * 
-     * @param log_prefix Log prefix (Contains ID)
+     * @param id Thread id
      */
 
-    public QueryServer(String log_prefix) {
-        this.log_prefix = log_prefix;
-        receive_port = BWPorts.QUERY_RECEIVE.getPort();
+    public QueryServer(int id) {
+        this.log_prefix = std_log_prefix + "(" + id + ")";
+        this.setName(log_prefix);
+        this.log_prefix += ": ";
+
+        receive_port = BWPorts.QUERY_RECEIVE;
 
     }
 
     /**
      * Program init
      * 
-     * @param log_prefix Log prefix (Contains ID)
+     * @param id Thread id
      * @param receive_port Receive port
      */
 
-    public QueryServer(String log_prefix, int receive_port) {
-        this.log_prefix = log_prefix;
+    public QueryServer(int id, Ports receive_port) {
+        this.log_prefix = std_log_prefix + "(" + id + ")";
+        this.setName(log_prefix);
+        this.log_prefix += ": ";
+
         this.receive_port = receive_port;
 
     }
@@ -78,15 +91,15 @@ public class QueryServer extends GenericThread {
     // ------------------------- Logging
 
     /** Logging prefix */
-    private String log_prefix;
+    public String log_prefix;
 
     /** Standard logging prefix */
-    public volatile static String std_log_prefix = "Query Server:";
+    public volatile static String std_log_prefix = "Query Server";
 
     // ------------------------- Queue
 
     /** Bot queue */
-    public volatile static Queue<Bot> bot_queue;
+    public volatile Queue<Bot> bot_queue;
 
     // ------------------------- Socket
 
@@ -94,7 +107,7 @@ public class QueryServer extends GenericThread {
     private ClientUDP query_socket;
 
     /** */
-    private int receive_port;
+    private Ports receive_port;
 
     // ------------------------- Thread Control
 
@@ -112,7 +125,7 @@ public class QueryServer extends GenericThread {
 
     public void run() {
         // Ready
-        Log.sendMessage("Query Server: Running", ConsoleColors.GREEN);
+        Log.sendMessage(log_prefix);
 
         // Setup lists
         bot_queue = new LinkedList<>();
@@ -120,10 +133,12 @@ public class QueryServer extends GenericThread {
         // Constantly fill requests
         while (run) {
             fillRequest();
+
         }
 
         // Exit
         Log.sendMessage(log_prefix + "Query Server Process Stopped!");
+
     }
 
     // ------------------------- Request Filler
@@ -134,28 +149,31 @@ public class QueryServer extends GenericThread {
      */
 
     private void fillRequest() {
+        // Pull a random query generator
+        QueryGenerator gen = ThreadManager.generators[new Random(ThreadManager.generators.length).nextInt()];
+
         // If no requests or queries, wait
-        if (bot_queue.size() == 0 || QueryGenerator.query_queue.size() == 0) {
+        if (bot_queue.size() == 0 || gen.query_queue.size() == 0) {
             MiscUtil.waitasec(.10);
             return;
 
         } 
 
         // Pick top off queue
-        Query query_to_send = QueryGenerator.query_queue.poll();
+        Query query_to_send = gen.query_queue.poll();
         Bot bot_to_serve = bot_queue.poll();
 
         // Notification
-        Log.sendMessage(log_prefix + "Serving " + bot_to_serve.ip, ConsoleColors.YELLOW);
+        Log.sendMessage(log_prefix, "Serving " + bot_to_serve.ip, ConsoleColors.YELLOW);
 
         // Setup client
-        query_socket = new ClientUDP(bot_to_serve.ip, new ManualPort(receive_port), log_prefix, ConsoleColors.YELLOW);
+        query_socket = new ClientUDP(bot_to_serve.ip, receive_port, log_prefix, ConsoleColors.YELLOW);
 
         // Send and then close
         if (query_socket.startClient()) {
             query_socket.sendMessage(query_to_send.getQuery());
             query_socket.closeClient();
-            Log.sendMessage(log_prefix + "Done serving " + bot_to_serve.ip, ConsoleColors.YELLOW);
+            Log.sendMessage(log_prefix, "Done serving " + bot_to_serve.ip, ConsoleColors.YELLOW);
 
         }
     }
@@ -165,17 +183,28 @@ public class QueryServer extends GenericThread {
      * Many queries are added. They will be served to the bots as needed.
      * 
      * @param query Search query to enque
-     * 
-     * @deprecated No lpnger needed on this class
      */
 
-    @Deprecated
-    public synchronized static void addQuery(Query query) {
-        if (QueryGenerator.query_queue.size() < QueryGenerator.MAX_QUERY_QUEUE_SIZE) {
-            // Add to queue if the que is under specified size
-            QueryGenerator.query_queue.add(query);
+    public synchronized void addQuery(Query query) {
+        // Pull a random query generator
+        QueryGenerator gen = ThreadManager.generators[new Random(ThreadManager.generators.length).nextInt()];
 
-        } 
+        if (gen.query_queue.size() < gen.MAX_QUERY_QUEUE_SIZE) {
+            // Add to queue if the que is under specified size
+            gen.query_queue.add(query);
+
+        } else {
+            do {
+                // Run other generators to check
+                MiscUtil.waitasec();
+                gen = ThreadManager.generators[new Random(ThreadManager.generators.length).nextInt()];
+
+            } while (gen.query_queue.size() < gen.MAX_QUERY_QUEUE_SIZE);
+
+            // Add to queue if the que is under specified size
+            gen.query_queue.add(query);
+
+        }
     }
 
     /**
@@ -187,7 +216,17 @@ public class QueryServer extends GenericThread {
      */
 
     @Deprecated
-    public synchronized static boolean readyForQuery() { return QueryGenerator.query_queue.size() > QueryGenerator.MAX_QUERY_QUEUE_SIZE; }
+    public synchronized boolean readyForQuery() { 
+        for (QueryGenerator gen : ThreadManager.generators) {
+            if (gen.query_queue.size() < gen.MAX_QUERY_QUEUE_SIZE) {
+                return false;
+
+            }
+        }
+
+        return true;
+    
+    }
 
     /**
      * Adds a bot into the queue <p>
@@ -196,7 +235,7 @@ public class QueryServer extends GenericThread {
      * @param bot bot to enque
      */
     
-    public synchronized static void addBot(Bot bot) {
+    public synchronized void addBot(Bot bot) {
         if (NetTools.isValid(bot.ip)) {
             // If bot has valid ip, add it to the queue
             bot_queue.add(bot);

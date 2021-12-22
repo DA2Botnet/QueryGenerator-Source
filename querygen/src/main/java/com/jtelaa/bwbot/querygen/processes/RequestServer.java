@@ -1,5 +1,7 @@
 package com.jtelaa.bwbot.querygen.processes;
 
+import java.util.Random;
+
 import com.jtelaa.bwbot.bwlib.BWMessages;
 import com.jtelaa.bwbot.bwlib.BWPorts;
 import com.jtelaa.bwbot.querygen.App;
@@ -31,17 +33,21 @@ public class RequestServer extends GenericThread {
 
     public RequestServer() {
         log_prefix = std_log_prefix;
+        this.setName(log_prefix);
+        log_prefix += ": ";
 
     }
 
     /**
      * Program init
      * 
-     * @param log_prefix Log prefix (Contains ID)
+     * @param id thread id
      */
 
-    public RequestServer(String log_prefix) {
-        this.log_prefix = log_prefix;
+    public RequestServer(int id) {
+        this.log_prefix = std_log_prefix + "(" + id + ")";
+        this.setName(log_prefix);
+        this.log_prefix += ":";
 
     }
 
@@ -56,10 +62,10 @@ public class RequestServer extends GenericThread {
     // ------------------------- Logging
 
     /** Logging prefix */
-    private String log_prefix;
+    public String log_prefix;
 
     /** Standard logging prefix */
-    public volatile static String std_log_prefix = "Request Server:";
+    public volatile static String std_log_prefix = "Request Server";
 
     // ------------------------- Thread Processes
 
@@ -84,18 +90,18 @@ public class RequestServer extends GenericThread {
                     if (response.contains(BWMessages.QUERY_REQUEST_MESSAGE.getMessage())) {
                         bot_address = server.getClientAddress();
 
-                        QueryServer.addBot(new Bot(bot_address));
-                        Log.sendMessage(log_prefix + "Request Server: Request from " + bot_address, ConsoleColors.YELLOW);
+                        ThreadManager.query_servers[new Random(ThreadManager.query_servers.length).nextInt()].addBot(new Bot(bot_address));
+                        Log.sendMessage(log_prefix, "Request from " + bot_address, ConsoleColors.YELLOW);
                 
                     // If the message does not contain a request
                     } else {
-                        Log.sendMessage(log_prefix + "Request Server: Invalid Request", ConsoleColors.YELLOW);
+                        Log.sendMessage(log_prefix, "Invalid Request", ConsoleColors.YELLOW);
 
                     }
 
                 // Error handling
                 } catch (Exception e) {
-                    Log.sendMessage(log_prefix + "Request Server: Could not resolve requesting bot's IP", ConsoleColors.RED);
+                    Log.sendMessage(log_prefix, "Could not resolve requesting bot's IP", ConsoleColors.RED);
                     MiscUtil.waitasec(.1);
 
                 }

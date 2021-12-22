@@ -36,17 +36,22 @@ public class QueryGenerator extends GenericThread {
         // Sets up file list
         SearchHandler.setupFileList();
         log_prefix = std_log_prefix;
+        this.setName(log_prefix);
+        log_prefix += ": ";
 
     }
 
     /**
      * Program init
      * 
-     * @param log_prefix Log prefix (Contains ID)
+     * @param id id
      */
 
-    public QueryGenerator(String log_prefix) {
-        this.log_prefix = log_prefix;
+    public QueryGenerator(int id) {
+        this.log_prefix = std_log_prefix + "(" + id + ")";
+        this.setName(log_prefix);
+        this.log_prefix += ": ";
+        
         SearchHandler.setupFileList();
 
     }
@@ -62,18 +67,18 @@ public class QueryGenerator extends GenericThread {
     // ------------------------- Logging
 
     /** Logging prefix */
-    private String log_prefix;
+    public String log_prefix;
 
     /** Standard logging prefix */
-    public volatile static String std_log_prefix = "Query Generator:";
+    public volatile static String std_log_prefix = "Query Generator";
 
     // ------------------------- Generation Settings Control
 
     /** Query queue */
-    public volatile static Queue<Query> query_queue;
+    public Queue<Query> query_queue;
 
     /** Maximum size of the query queu */
-    public volatile static int MAX_QUERY_QUEUE_SIZE = 10000;
+    public int MAX_QUERY_QUEUE_SIZE = 10000;
 
     // ------------------------- Query Generation Collection
     
@@ -111,16 +116,16 @@ public class QueryGenerator extends GenericThread {
         query_queue = new LinkedList<>();
 
         // Wait
-        Log.sendMessage(log_prefix + "Waiting until other threads begin!", ConsoleColors.GREEN_BRIGHT);
-        Log.sendMessage(log_prefix + "Generator Wait 30s", ConsoleColors.GREEN_BRIGHT);
+        Log.sendMessage(log_prefix, "Waiting until other threads begin!", ConsoleColors.GREEN_BRIGHT);
+        Log.sendMessage(log_prefix, "Generator Wait 30s", ConsoleColors.GREEN_BRIGHT);
         MiscUtil.waitasec(15);
-        Log.sendMessage(log_prefix + "Generator Wait 15s", ConsoleColors.GREEN_BRIGHT);
+        Log.sendMessage(log_prefix, "Generator Wait 15s", ConsoleColors.GREEN_BRIGHT);
         MiscUtil.waitasec(15);
-        Log.sendMessage(log_prefix + "Generator Wait Time Complete", ConsoleColors.GREEN_BRIGHT);
+        Log.sendMessage(log_prefix, "Generator Wait Time Complete", ConsoleColors.GREEN_BRIGHT);
 
         // Max Query Size
         MAX_QUERY_QUEUE_SIZE = Integer.parseInt(App.my_config.getProperty("query_queue_size", "1000"));
-        Log.sendMessage(log_prefix + "Queue size set to " + MAX_QUERY_QUEUE_SIZE, ConsoleColors.PURPLE_BOLD_BRIGHT);
+        Log.sendMessage(log_prefix, "Queue size set to " + MAX_QUERY_QUEUE_SIZE, ConsoleColors.PURPLE_BOLD_BRIGHT);
 
     }
 
@@ -148,7 +153,7 @@ public class QueryGenerator extends GenericThread {
 
                 if (rng <= 50) {
                     // Add a single query
-                    Log.sendMessage(log_prefix + "Generating (1) - " + query_queue.size() + "/" + MAX_QUERY_QUEUE_SIZE, ConsoleColors.PURPLE);
+                    Log.sendMessage(log_prefix, "Generating (1) - " + query_queue.size() + "/" + MAX_QUERY_QUEUE_SIZE, ConsoleColors.PURPLE);
                     query_queue.add(generate());
 
                 } else {
@@ -156,7 +161,7 @@ public class QueryGenerator extends GenericThread {
                     int count = rand.nextInt(rng);
 
                     // Generate random query
-                    Log.sendMessage(log_prefix + "Generating ("+count+") - " + query_queue.size() + "/" + MAX_QUERY_QUEUE_SIZE, ConsoleColors.PURPLE);
+                    Log.sendMessage(log_prefix, "Generating ("+count+") - " + query_queue.size() + "/" + MAX_QUERY_QUEUE_SIZE, ConsoleColors.PURPLE);
                     Query[] queries = generate(count);
                     
                     // Add queries
@@ -172,7 +177,7 @@ public class QueryGenerator extends GenericThread {
 
                 } else {
                     // Wait if not ready
-                    Log.sendMessage(log_prefix + "Generation Stopped (" + query_queue.size() + ")", ConsoleColors.PURPLE_BOLD_BRIGHT);
+                    Log.sendMessage(log_prefix, "Generation Stopped (" + query_queue.size() + ")", ConsoleColors.PURPLE_BOLD_BRIGHT);
                     MiscUtil.waitamoment(10000);
 
                 }

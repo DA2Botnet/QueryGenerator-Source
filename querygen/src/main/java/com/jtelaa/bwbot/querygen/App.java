@@ -47,50 +47,74 @@ public class App {
     public static void main(String[] args) {
         // Check for first time setup
         boolean first_time = false;
+        boolean multi_interface = true;
         for (String arg : args) {
             if (arg.equalsIgnoreCase("setup")) {
                 Log.sendManSysMessage("Loading first - time config");
                 first_time = true;
+
+            } if (arg.equalsIgnoreCase("single")) {
+                multi_interface = false;
+
             }
         }
 
         // Load normally if not first time
-        if (first_time) {
-            // Load banners
-            ConsoleBanners.loadRemoteBanners("QueryGen");
-
-            // Get config template
-            Log.sendManSysMessage("Loading config template");
-            ComputerControl.sendCommand("cd ~/ && curl https://raw.githubusercontent.com/DA2Botnet/QueryGenerator-Source/main/config_template/querygen_config.properties > querygen_config.properties");
-
-            // Get thread config template
-            Log.sendManSysMessage("Loading thread config template");
-            ComputerControl.sendCommand("cd ~/ && curl https://raw.githubusercontent.com/DA2Botnet/QueryGenerator-Source/main/config_template/thread_config.jsom > thread_config.json");
-
-            // Load searches
-            SearchHandler.loadRemoteSearches();
+        if (first_time) { 
+            loadRemote(); 
 
         }
 
-        my_config = PropertiesUtils.importConfig(properties_path); 
+        // Load
+        loadConfig();
+        logBegin(args);
+        interfaceSetup(multi_interface);
 
-        my_config.setProperty("log_ip", FranchiseUtils.resolveDefaultLogIP());
-        my_config.setProperty("db_ip", FranchiseUtils.resolveDefaultDBIP());
+        // Done
+        Log.sendMessage("Main: Done", ConsoleColors.GREEN);
 
-        try {
-            querySettings();
+        // CLI
+        CLIBegin();
 
-        } catch (EmptySQLURLException e) {
-            e.printStackTrace();
+        // Shutdown
+        Log.sendMessage("Main: Shutting down!");
+
+    }
+
+    /**
+     * Setup the interfaces
+     * 
+     * @param multi_interface
+     */
+
+    private static void interfaceSetup(boolean multi_interface) {
+        if (multi_interface) {
+            try {
+                ThreadManager.setupProcesses("~/thread_config.json");
+    
+            } catch (Exception e) {
+                Log.sendMessage("Main: ", e, ConsoleColors.RED);
+                System.exit(0);
+    
+            }
+
+        } else {
+            ThreadManager.setupProcesses();
 
         }
 
+    }
+
+    /**
+     * Setup the logging
+     * 
+     * @param args
+     */
+
+    private static void logBegin(String[] args) {
         // Start Logging
         Log.loadConfig(my_config, args);
         Log.clearHistory();
-
-        // List properties
-        for (String line : PropertiesUtils.listProperties(my_config)) { Log.sendSysMessage(line); }
 
         // Startup
         Log.sendSysMessage("Main: Starting.....\n");
@@ -102,62 +126,52 @@ public class App {
         Log.openClient(my_config.getProperty("log_ip", my_config.getProperty("log_ip")));
         Log.openConnector();
 
-        try {
-            ThreadManager.setupProcesses("~/thread_config.json");
-
-        } catch (Exception e) {
-            Log.sendMessage("Main: ", e, ConsoleColors.RED);
-            System.exit(0);
-
-        }
-
-        // Done
-        Log.sendMessage("Main: Done", ConsoleColors.GREEN);
-
-        // Remote CLI
-        if (my_config.getProperty("remote_cli", "false").equalsIgnoreCase("true")) {
-            Log.sendMessage("CLI: Remote Cli Enabled");
-            rem_cli = new RemoteCLI();
-            rem_cli.start();
-
-        } else {
-            Log.sendMessage("CLI: No Remote CLI");
-
-        }
-
-        // Local CLI
-        if (my_config.getProperty("local_cli", "true").equalsIgnoreCase("true")) {
-            Log.sendMessage("CLI: Local CLI Allowed");
-            sys_cli = new SysCLI();
-            sys_cli.start();
-
-        } else {
-            Log.sendMessage("CLI: No Local CLI");
-
-        }
-
-        Log.sendMessage("CLI: Waiting 45s for CLI bootup");
-        MiscUtil.waitasec(45);
-        Log.sendMessage("CLI: Done waiting");
-
-        if (my_config.getProperty("remote_cli", "false").equalsIgnoreCase("true")) { rem_cli.runCLI(); }
-        if (my_config.getProperty("local_cli", "true").equalsIgnoreCase("true")) { sys_cli.runCLI(); }
-
-        /*
-
-        // Wait
-        MiscUtil.waitasec();
-
-        Log.sendLogMessage("Done! Shutting down");
-        Log.closeLog();
-        req_srv.stopServer();
-        qry_serv.stopReceiver();
-        qry_gen.stopGen();
-
-        */
     }
 
     /**
+     * Load the config files
+     */
+
+    private static void loadConfig() {
+        // Load config
+        my_config = PropertiesUtils.importConfig(properties_path); 
+
+        // Set franchise
+        my_config.setProperty("log_ip", FranchiseUtils.resolveDefaultLogIP());
+        my_config.setProperty("db_ip", FranchiseUtils.resolveDefaultDBIP());
+
+        try {
+            querySettings();
+
+        } catch (EmptySQLURLException e) {
+            e.printStackTrace();
+
+        }
+    }
+
+    /**
+     * Load the remote files
+     */
+
+    private static void loadRemote() {
+        // Load banners
+        ConsoleBanners.loadRemoteBanners("QueryGen");
+
+        // Get config template
+        Log.sendManSysMessage("Loading config template");
+        ComputerControl.sendCommand("cd ~/ && curl https://raw.githubusercontent.com/DA2Botnet/QueryGenerator-Source/main/config_template/querygen_config.properties > querygen_config.properties");
+
+        // Get thread config template
+        Log.sendManSysMessage("Loading thread config template");
+        ComputerControl.sendCommand("cd ~/ && curl https://raw.githubusercontent.com/DA2Botnet/QueryGenerator-Source/main/config_template/thread_config.jsom > thread_config.json");
+
+        // Load searches
+        SearchHandler.loadRemoteSearches();
+
+    }
+
+    /**
+     * Query for new settings
      * 
      * @return
      */
@@ -187,5 +201,40 @@ public class App {
         PropertiesUtils.exportConfig(properties_path, my_config);
 
     }
-    
+
+    /**
+     * Start the CLI
+     */
+
+    private static void CLIBegin() {
+        // Remote CLI
+        if (my_config.getProperty("remote_cli", "false").equalsIgnoreCase("true")) {
+            Log.sendMessage("CLI: Remote Cli Enabled");
+            rem_cli = new RemoteCLI();
+            rem_cli.start();
+
+        } else {
+            Log.sendMessage("CLI: No Remote CLI");
+
+        }
+
+        // Local CLI
+        if (my_config.getProperty("local_cli", "true").equalsIgnoreCase("true")) {
+            Log.sendMessage("CLI: Local CLI Allowed");
+            sys_cli = new SysCLI();
+            sys_cli.start();
+
+        } else {
+            Log.sendMessage("CLI: No Local CLI");
+
+        }
+
+        Log.sendMessage("CLI: Waiting 45s for CLI bootup");
+        MiscUtil.waitasec(45);
+        Log.sendMessage("CLI: Done waiting");
+
+        if (my_config.getProperty("remote_cli", "false").equalsIgnoreCase("true")) { rem_cli.runCLI(); }
+        if (my_config.getProperty("local_cli", "true").equalsIgnoreCase("true")) { sys_cli.runCLI(); }
+
+    }
 }
