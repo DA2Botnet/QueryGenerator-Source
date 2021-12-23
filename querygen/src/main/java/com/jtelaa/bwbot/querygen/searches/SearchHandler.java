@@ -25,7 +25,6 @@ public class SearchHandler {
     /** Path of lists */
     // private static final String PATH =
     // "com/jtelaa/bwbot/querygen/searches/searchdata/";
-    // TODO Make internal again
 
     /** Path of lists */
     private static final String PATH = "~/searches/";

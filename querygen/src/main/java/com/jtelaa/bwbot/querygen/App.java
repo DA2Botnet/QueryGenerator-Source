@@ -28,8 +28,6 @@ import com.jtelaa.da2.lib.sql.SQL;
  * @see com.jtelaa.bwbot.querygen.processes.QueryGenerator
  */
 
- // TODO Find a way to include files in the jar
-
 public class App {
     /** The remote cli local object */ 
     public static RemoteCLI rem_cli;
