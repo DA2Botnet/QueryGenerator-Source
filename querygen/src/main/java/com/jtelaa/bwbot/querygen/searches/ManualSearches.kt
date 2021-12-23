@@ -1,44 +1,44 @@
-package com.jtelaa.bwbot.querygen.searches;
+package com.jtelaa.bwbot.querygen.searches
 
-import java.util.ArrayList;
+import java.util.ArrayList
 
 /**
  * List of manual searches
- * 
+ *
  * Can still be used but has less randomness (May be deprecated in future)
- * 
+ *
  * @since 1
  * @author Joseph
  */
 
-public class ManualSearches {
-
+object ManualSearches {
     /**
      * Manual searches
-     * 
+     *
      * @return searches as an arraylist
      */
 
-    public synchronized static ArrayList<String> searches() {
-        ArrayList<String> searches = new ArrayList<String>();
+    @Synchronized
+    fun searches(): ArrayList<String> {
+        val searches: ArrayList<String> = ArrayList<String>()
 
-        for (String search : searches) {
-            searches.add(search);
+        for (search in searches) {
+            searches.add(search)
 
         }
 
-        return searches;
-        
+        return searches
     }
 
     /**
      * Manual searches
      */
 
-    public volatile static String[] searches = {
+    @Volatile
+    var searches = arrayOf(
         "youtube", "facebook", "twitter", "instagram",
-        "snapchat", "wikipedia", "tumblr", "amazon", 
-        "gmail", "outlook", "hotmail", "aol", 
+        "snapchat", "wikipedia", "tumblr", "amazon",
+        "gmail", "outlook", "hotmail", "aol",
         "temp email", "google", "bing", "duckduckgo",
         "yahoo", "yahoo email", "weather", "netflix",
         "hulu", "disney", "hbo max", "adult swim",
@@ -51,7 +51,7 @@ public class ManualSearches {
         "google+drive", "google+translate", "google+slides",
         "google+sheets", "news", "this+day+in+history",
         "google+classroom", "minecraft", "fortnite", "tetris",
-        "roblox", "steam", "terraria", "calculator", "periodic+table", 
+        "roblox", "steam", "terraria", "calculator", "periodic+table",
         "webmd", "paypal", "speedtest", "whatismyip", "target",
         "aero", "f21", "rue21", "pink", "hollister", "gap",
         "old+navy", "zillow", "best buy", "bank+of+america",
@@ -69,8 +69,6 @@ public class ManualSearches {
         "vsco", "macys", "kohls", "belk", "nike",
         "under armour", "turbotax", "xfinity", "timer",
         "pandora", "zoom", "verizon", "spectrum"
-
-
-    };
-
+    )
+    
 }
