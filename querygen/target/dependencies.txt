@@ -1,0 +1,19 @@
+digraph "com.jtelaa.bwbot:querygen:jar:1.0-SNAPSHOT" { 
+	"com.jtelaa.bwbot:querygen:jar:1.0-SNAPSHOT" -> "junit:junit:jar:4.13.1:test" ; 
+	"com.jtelaa.bwbot:querygen:jar:1.0-SNAPSHOT" -> "com.jtelaa.da2:lib:jar:1.1-SNAPSHOT:compile" ; 
+	"com.jtelaa.bwbot:querygen:jar:1.0-SNAPSHOT" -> "com.jtelaa.bwbot:bwlib:jar:1.0-SNAPSHOT:compile" ; 
+	"com.jtelaa.bwbot:querygen:jar:1.0-SNAPSHOT" -> "com.googlecode.json-simple:json-simple:jar:1.1:compile" ; 
+	"com.jtelaa.bwbot:querygen:jar:1.0-SNAPSHOT" -> "org.jetbrains.kotlin:kotlin-stdlib:jar:1.6.10:compile" ; 
+	"junit:junit:jar:4.13.1:test" -> "org.hamcrest:hamcrest-core:jar:1.3:test" ; 
+	"com.jtelaa.da2:lib:jar:1.1-SNAPSHOT:compile" -> "org.apache.commons:commons-lang3:jar:3.0:compile" ; 
+	"com.jtelaa.da2:lib:jar:1.1-SNAPSHOT:compile" -> "com.googlecode.libphonenumber:libphonenumber:jar:8.9.9:compile" ; 
+	"com.jtelaa.da2:lib:jar:1.1-SNAPSHOT:compile" -> "commons-validator:commons-validator:jar:1.7:compile" ; 
+	"com.jtelaa.da2:lib:jar:1.1-SNAPSHOT:compile" -> "com.sun.mail:javax.mail:jar:1.6.2:compile" ; 
+	"commons-validator:commons-validator:jar:1.7:compile" -> "commons-beanutils:commons-beanutils:jar:1.9.4:compile" ; 
+	"commons-validator:commons-validator:jar:1.7:compile" -> "commons-digester:commons-digester:jar:2.1:compile" ; 
+	"commons-validator:commons-validator:jar:1.7:compile" -> "commons-logging:commons-logging:jar:1.2:compile" ; 
+	"commons-validator:commons-validator:jar:1.7:compile" -> "commons-collections:commons-collections:jar:3.2.2:compile" ; 
+	"com.sun.mail:javax.mail:jar:1.6.2:compile" -> "javax.activation:activation:jar:1.1:compile" ; 
+	"org.jetbrains.kotlin:kotlin-stdlib:jar:1.6.10:compile" -> "org.jetbrains:annotations:jar:13.0:compile" ; 
+	"org.jetbrains.kotlin:kotlin-stdlib:jar:1.6.10:compile" -> "org.jetbrains.kotlin:kotlin-stdlib-common:jar:1.6.10:compile" ; 
+ } 
