@@ -1,6 +1,18 @@
 package com.jtelaa.bwbot.querygen.processes
 
+import com.jtelaa.bwbot.bwlib.BWPorts
+import com.jtelaa.bwbot.querygen.util.InvalidThreadCountException
+import com.jtelaa.da2.lib.console.ConsoleColors
+import com.jtelaa.da2.lib.log.Log
+import com.jtelaa.da2.lib.net.NetTools
+
+import org.json.simple.JSONObject
+import org.json.simple.parser.JSONParser
+import org.json.simple.parser.ParseException
+
 import java.io.FileNotFoundException
+import java.io.FileReader
+import java.io.IOException
 
 /**
  * Manages all of the threads in the system (Except for main thread (which this runs on) and CLIs)
@@ -12,15 +24,15 @@ object ThreadManager {
     // ------------------------- Processes
     /** Query Generator threads  */
     @Volatile
-    var generators: Array<QueryGenerator?>
+    lateinit var generators: Array<QueryGenerator?>
 
     /** Query Server threads  */
     @Volatile
-    var query_servers: Array<QueryServer?>
+    lateinit var query_servers: Array<QueryServer?>
 
     /** Request Server threads  */
     @Volatile
-    var request_servers: Array<RequestServer?>
+    lateinit var request_servers: Array<RequestServer?>
 
     // ------------------------- Logs
 
@@ -244,27 +256,27 @@ object ThreadManager {
         var output = ""
 
         // Status indicators
-        val running: String = ConsoleColors.GREEN.toString() + "Running" + ConsoleColors.CLEAR
-        val not_running: String = ConsoleColors.RED.toString() + "Not Running" + ConsoleColors.CLEAR
+        val running: String = ConsoleColors.GREEN.toString() + "Running" + ConsoleColors.CLEAR.toString()
+        val not_running: String = ConsoleColors.RED.toString() + "Not Running" + ConsoleColors.CLEAR.toString()
 
         // Check status of the generators
         output += "Generators:\n"
         for (i in generators.indices) {
-            output += generators[i].log_prefix + (if (generators[i].generatorReady()) running else not_running) + "\n"
+            output += generators[i]!!.log_prefix + (if (generators[i]!!.generatorReady()) running else not_running) + "\n"
         
         }
 
         // Check status of the request servers
         output += "Request Servers:\n"
         for (i in request_servers.indices) {
-            output += request_servers[i].log_prefix + (if (request_servers[i].serverReady()) running else not_running) + "\n"
+            output += request_servers[i]!!.log_prefix + (if (request_servers[i]!!.serverReady()) running else not_running) + "\n"
         
         }
 
         // Check statis of the query servers
         output += "Query Servers:\n"
         for (i in query_servers.indices) {
-            output += query_servers[i].log_prefix + (if (query_servers[i].serverReady()) running else not_running) + "\n"
+            output += query_servers[i]!!.log_prefix + (if (query_servers[i]!!.serverReady()) running else not_running) + "\n"
         
         }
 
@@ -272,7 +284,9 @@ object ThreadManager {
         Log.sendMessage(output)
 
     }
+
     // ------------------------- Query Generators
+
     /**
      * Setup the query generators
      *
@@ -331,7 +345,7 @@ object ThreadManager {
         }
 
         Log.sendMessage(log_prefix, "Starting Query Generator $id", ConsoleColors.GREEN)
-        generators[id].start()
+        generators[id]!!.start()
 
     }
 
@@ -372,7 +386,7 @@ object ThreadManager {
         }
 
         Log.sendMessage(log_prefix, "Stopping Query Generator $id", ConsoleColors.GREEN)
-        generators[id].stopGenerator()
+        generators[id]!!.stopGenerator()
 
     }
 

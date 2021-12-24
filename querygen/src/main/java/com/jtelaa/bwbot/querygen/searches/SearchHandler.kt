@@ -1,5 +1,10 @@
 package com.jtelaa.bwbot.querygen.searches
 
+import com.jtelaa.bwbot.bwlib.Query
+import com.jtelaa.da2.lib.control.ComputerControl
+import com.jtelaa.da2.lib.files.FileUtil
+import com.jtelaa.da2.lib.log.Log
+import java.io.File
 import java.util.Random
 
 /**
@@ -20,10 +25,10 @@ object SearchHandler {
     // "com/jtelaa/bwbot/querygen/searches/searchdata/";
 
     /** Path of lists  */
-    private const val PATH = "~/searches/"
+    private val PATH = "~/searches/"
 
     /** Logging prefix  */
-    private const val log_prefix = "Search Handler: "
+    private val log_prefix = "Search Handler: "
 
     /** File list  */
     @Volatile
@@ -57,7 +62,7 @@ object SearchHandler {
      * @param args Arguments
      */
 
-    fun main(args: Array<String?>?) {
+    fun main(args: Array<String>) {
         while (true) {
             //System.out.println(Query.BING_URL + getRandomSearch());
             System.out.println(mangle("testme"))
@@ -72,7 +77,7 @@ object SearchHandler {
      */
 
     @get:Synchronized
-    val randomSearch: Query?
+    val randomSearch: Query
         get() {
             // Generate an array and pick at a random index
             val searches: Array<Query?> = getRandomSearches(100)
@@ -89,26 +94,26 @@ object SearchHandler {
      */
 
     @Synchronized
-    fun getRandomSearches(count: Int): Array<Query?> {
+    fun getRandomSearches(count: Int): List<Query> {
         val rand = Random()
 
         // Setup lists
-        val searches: Array<Query?> = arrayOfNulls<Query>(count)
+        val searches: List<Query> = MutableList()
         val search_list: ArrayList<String> = pickList() // all lines of one file
 
         // Populate lists
-        for (i in searches.indices) {
+        for (i in 0..count) {
             // Get query
-            var query_string: String = search_list.get(rand.nextInt(search_list.size() - 1)).toLowerCase()
+            var query_string: String = search_list.get(rand.nextInt(search_list.size - 1)).toLowerCase()
 
             // Mangle
-            if (rand.nextInt(20) === 1) {
+            if (rand.nextInt(20) == 1) {
                 query_string = mangle(query_string)
 
             }
 
             // Add search
-            searches[i] = Query(query_string)
+            searches.add(query_string)
 
         }
 
@@ -126,8 +131,7 @@ object SearchHandler {
     @Synchronized
     private fun pickList(): ArrayList<String> {
         // Get list
-        val file: File =
-            files.get(Random().nextInt(files.size() - 1))
+        var file: File = files!!.get(Random().nextInt(files!!.size - 1))
 
         // Return list + path
         return FileUtil.listLinesFile(file)
@@ -151,13 +155,13 @@ object SearchHandler {
             8 -> query = query.toUpperCase()
 
             1 -> {
-                val word = ""
+                var word: String = " "
                 var i = 0
-                while (i < query.length()) {
+                while (i < query.length) {
                     if (i % 2 == 0) {
-                        word.concat(query.substring(i, i + 1).toUpperCase())
+                        word += (query.substring(i, i + 1).toUpperCase())
                     } else {
-                        word.concat(query.substring(i, i + 1).toLowerCase())
+                        word += (query.substring(i, i + 1).toLowerCase())
                     }
                     i++
                 }
@@ -165,13 +169,13 @@ object SearchHandler {
             }
 
             2 -> {
-                val up = ""
+                var up: String = ""
                 var i = 0
-                while (i < query.length()) {
+                while (i < query.length) {
                     if (i % 2 == 0) {
-                        up.concat(query.substring(i, i + 1).toUpperCase())
+                        up += (query.substring(i, i + 1).toUpperCase())
                     } else {
-                        up.concat(query.substring(i, i + 1).toLowerCase())
+                        up += (query.substring(i, i + 1).toLowerCase())
                     }
                     i++
                 }
@@ -185,8 +189,6 @@ object SearchHandler {
             5 -> query = Typo.transposedChar(query)
 
             6 -> query = Typo.doubleChar(query)
-
-            7 -> query = Typo.bitFlip(query)
 
         }
 

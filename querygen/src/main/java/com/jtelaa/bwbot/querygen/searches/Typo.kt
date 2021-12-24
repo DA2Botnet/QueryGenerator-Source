@@ -25,7 +25,7 @@ object Typo {
         val r = Random()
 
         // Dictionary of close keys
-        val keyboard: Dictionary<String, String> = object : Hashtable<String?, String?>() {}
+        val keyboard: Dictionary<String, String> = object : Hashtable<String, String>() {}
 
         // list of close keys, use \t and # to use .split() without regex matching
         val kbd =
@@ -33,19 +33,19 @@ object Typo {
 
         // Split
         for (tuple in kbd.split("#")) {
-            val pairs: Array<String> = tuple.split("\t")
+            val pairs: List<String> = tuple.split("\t")
             keyboard.put(pairs[0], pairs[1])
         }
 
         var c = ""
-        
+
         do {
             // Pull a random character
-            val index: Int = r.nextInt(query.length())
-            c = Character.toString(query.charAt(index))
+            val index: Int = r.nextInt(query.length)
+            c = query.get(index) + ""
 
             // Get typos
-            val typos: Array<String> = keyboard.get(c).split(",")
+            val typos: List<String> = keyboard.get(c).split(",")
 
             // New character
             val c2 = typos[r.nextInt(typos.size)]
@@ -73,7 +73,7 @@ object Typo {
         val typo: String
 
         // Random char
-        val index: Int = r.nextInt(query.length())
+        val index: Int = r.nextInt(query.length)
 
         // Remove
         typo = query.substring(0, index) + query.substring(index + 1)
@@ -96,7 +96,7 @@ object Typo {
         val r = Random()
 
         // Random char
-        val index: Int = r.nextInt(query.length())
+        val index: Int = r.nextInt(query.length)
 
         // Swap
         typo = query.substring(0, index) + query.substring(index + 1, index + 2) + query.substring(
@@ -122,7 +122,7 @@ object Typo {
         val typo: String
 
         // Random char
-        val index: Int = r.nextInt(query.length())
+        val index: Int = r.nextInt(query.length)
 
         // Swap
         typo = query.substring(0, index) + query.substring(index - 1)
@@ -130,43 +130,5 @@ object Typo {
         // Return
         return typo
 
-    }
-
-    /**
-     * Mimics a bit flipping typo, chooses one character and replaces it with one of the possibilites of a bit flip
-     * Checks regex to make sure the character is in the alphabet or set of known numbers
-     *
-     * @param query
-     *
-     * @return query string, with one character replaced with a bit flipped version of itself
-     */
-    fun bitFlip(query: String): String {
-        val r = Random()
-        val typo: String
-        var new_letter: String
-
-        // Regex/Mask
-        val allowed_regex = "[a-zA-Z0-9_\\-\\.]"
-        val masks = intArrayOf(128, 64, 32, 16, 8, 4, 2, 1)
-
-        // Random char
-        val index: Int = r.nextInt(query.length())
-
-        // Bit flip
-        do {
-            new_letter = Character.toString(
-                Character.toChars(
-                    Integer.parseInt(Integer.toHexString(query.charAt(index))) xor masks[r.nextInt(masks.size)]
-                ).get(0)
-            ).toLowerCase()
-
-        } while (!new_letter.matches(allowed_regex))
-
-        // Put typo together
-        typo = query.substring(0, index) + String.valueOf(new_letter) + query.substring(index + 1)
-
-        // Return
-        return typo
-        
     }
 }

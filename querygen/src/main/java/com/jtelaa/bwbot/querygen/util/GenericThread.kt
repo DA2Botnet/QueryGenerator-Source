@@ -8,7 +8,7 @@ import kotlin.jvm.Synchronized
  * @author Joseph
  */
 
-class GenericThread : Thread() {
+open class GenericThread : Thread() {
     // ------------------------- Thread Control
 
     /** Boolean to control the thread  */

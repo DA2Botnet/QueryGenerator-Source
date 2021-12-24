@@ -1,6 +1,13 @@
 package com.jtelaa.bwbot.querygen.processes
 
-import java.util.LinkedList
+import com.jtelaa.bwbot.bwlib.Query
+import com.jtelaa.bwbot.querygen.App
+import com.jtelaa.bwbot.querygen.util.GenericThread
+import com.jtelaa.bwbot.querygen.searches.SearchHandler
+import com.jtelaa.da2.lib.console.ConsoleColors
+import com.jtelaa.da2.lib.log.Log
+import com.jtelaa.da2.lib.misc.MiscUtil
+import java.util.*
 
 /**
  * This process generates random search queries to be searched by clients.
