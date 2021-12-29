@@ -34,7 +34,7 @@ public class QueryGenerator extends GenericThread {
 
     public QueryGenerator() {
         // Sets up file list
-        SearchHandler.setupFileList();
+        this.searchHandler = new SearchHandler().setupFileList();
 
         log_prefix = std_log_prefix;
         this.setName(log_prefix);
@@ -53,7 +53,7 @@ public class QueryGenerator extends GenericThread {
         this.setName(log_prefix);
         this.log_prefix += ": ";
         
-        SearchHandler.setupFileList();
+        this.searchHandler = new SearchHandler().setupFileList();
 
     }
 
@@ -72,6 +72,10 @@ public class QueryGenerator extends GenericThread {
 
     /** Standard logging prefix */
     public volatile static String std_log_prefix = "Query Generator";
+
+    // ------------------------- Files
+
+    public SearchHandler searchHandler;
 
     // ------------------------- Generated Query List
 
@@ -102,7 +106,7 @@ public class QueryGenerator extends GenericThread {
      */
 
     private Query generate() {
-        return SearchHandler.getRandomSearch();
+        return searchHandler.getRandomSearch();
 
     }
 
@@ -115,7 +119,7 @@ public class QueryGenerator extends GenericThread {
      */
 
     private Query[] generate(int count) {
-        return SearchHandler.getRandomSearches(count);
+        return searchHandler.getRandomSearches(count);
 
     }
 

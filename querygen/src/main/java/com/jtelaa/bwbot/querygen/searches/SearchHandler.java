@@ -3,6 +3,8 @@ package com.jtelaa.bwbot.querygen.searches;
 import java.util.Random;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 import com.jtelaa.bwbot.bwlib.Query;
 import com.jtelaa.da2.lib.control.ComputerControl;
@@ -18,22 +20,22 @@ import com.jtelaa.da2.lib.log.Log;
  * 
  * @see com.jtelaa.bwbot.bwlib.Query
  * @see com.jtelaa.bwbot.querygen.processes.QueryGenerator
+ * 
+ * Utility that generates a variety of typos
+ * Thanks so much https://github.com/KeywordDomains/TypoGenerator
+ * 
  */
 
 public class SearchHandler {
 
     /** Path of lists */
-    // private static final String PATH =
-    // "com/jtelaa/bwbot/querygen/searches/searchdata/";
-
-    /** Path of lists */
-    private static final String PATH = "~/searches/";
+    private static volatile String PATH = "~/searches/";
 
     /** Logging prefix */
-    private static String log_prefix = "Search Handler: ";
+    private static volatile String log_prefix = "Search Handler: ";
 
     /** File list */
-    public static volatile ArrayList<File> files;
+    private ArrayList<File> files;
 
     /**
      * Loads searches fromm the git repo
@@ -50,23 +52,10 @@ public class SearchHandler {
      * Setup file list (run on init)
      */
 
-    public static synchronized void setupFileList() {
+    public SearchHandler setupFileList() {
         files = FileUtil.getFiles(PATH);
+        return this;
 
-    }
-
-    /**
-     * Test that prints out searches
-     * 
-     * @param args Arguments
-     */
-
-    public static void main(String[] args) {
-        while (true) {
-            //System.out.println(Query.BING_URL + getRandomSearch());
-            System.out.println(mangle("testme"));
-
-        }
     }
 
     /**
@@ -75,7 +64,7 @@ public class SearchHandler {
      * @return new Query
      */
 
-    public synchronized static Query getRandomSearch() {
+    public Query getRandomSearch() {
         // Generate an array and pick at a random index
         Query[] searches = getRandomSearches(100);
         return searches[new Random().nextInt(searches.length - 1)];
@@ -90,7 +79,7 @@ public class SearchHandler {
      * @return Array of random searches
      */
 
-    public synchronized static Query[] getRandomSearches(int count) {
+    public Query[] getRandomSearches(int count) {
         Random rand = new Random();
 
         // Setup lists
@@ -121,7 +110,7 @@ public class SearchHandler {
      * @return List of popular searches
      */
 
-    private synchronized static ArrayList<String> pickList() {
+    private ArrayList<String> pickList() {
         // Get list
         File file = files.get(new Random().nextInt(files.size()-1));
         ArrayList<String> lines = FileUtil.listLinesFile(file);
@@ -139,7 +128,7 @@ public class SearchHandler {
      * @return mangled query
      */
 
-    public static String mangle(String query) {
+    private String mangle(String query) {
         // Pick case
         int num = new Random().nextInt(11);
 
@@ -151,60 +140,37 @@ public class SearchHandler {
 
             // Toggle case
             case 1: 
-                String word = "";
-
-                for (int i = 0; i < query.length(); i++) {
-                    if (i % 2 == 0) {
-                        word.concat(query.substring(i, i + 1).toUpperCase());
-
-                    } else {
-                        word.concat(query.substring(i, i + 1).toLowerCase());
-
-                    }
-                }
-
-                query = word;
+                query = randomToggle(query);
                 break;
 
             // Random uppercase letter
             case 2: 
-                String up = "";
-
-                for (int i = 0; i < query.length(); i++) {
-                    if (i % 2 == 0) {
-                        up.concat(query.substring(i, i + 1).toUpperCase());
-
-                    } else {
-                        up.concat(query.substring(i, i + 1).toLowerCase());
-
-                    }
-                }
-                query = up;
+                query = upper(query);
                 break;
 
             // Adjacent letter
             case 3:
-                query = Typo.wrongKey(query);
+                query = wrongKey(query);
                 break;
 
             // Remove character
             case 4:
-                query = Typo.missedChar(query);
+                query = missedChar(query);
                 break;
 
             // Character Swap
             case 5:
-                query = Typo.transposedChar(query);
+                query = transposedChar(query);
                 break;
 
             // Double characteer
             case 6:
-                query = Typo.doubleChar(query);
+                query = doubleChar(query);
                 break;
 
             // Bit flip
             case 7:
-                query = Typo.bitFlip(query);
+                query = bitFlip(query);
                 break;
 
         }
@@ -213,4 +179,200 @@ public class SearchHandler {
         return query;
 
     }
+
+    private String randomToggle(String query) {
+        String word = "";
+
+        for (int i = 0; i < query.length(); i++) {
+            if (i % 2 == 0) {
+                word.concat(query.substring(i, i + 1).toUpperCase());
+
+            } else {
+                word.concat(query.substring(i, i + 1).toLowerCase());
+
+            }
+        }
+
+        return word;
+
+    }
+
+    private String upper(String query) {
+        String up = "";
+
+        for (int i = 0; i < query.length(); i++) {
+            if (i % 2 == 0) {
+                up.concat(query.substring(i, i + 1).toUpperCase());
+
+            } else {
+                up.concat(query.substring(i, i + 1).toLowerCase());
+
+            }
+        }
+
+        return up;
+        
+    }
+
+    /**
+     * Generates a wrong key typo by matching one random letter in the query string to a letter adjacent to it on the QWERTY keyboard
+     * 
+     * @param query
+     * 
+     * @return query string with one char wrong
+     */
+
+    private String wrongKey(String query) {
+        String typo;
+        Random r = new Random();
+        
+        // Dictionary of close keys
+        Dictionary<String, String> keyboard = new Hashtable<String, String>() {};
+        
+        // list of close keys, use \t and # to use .split() without regex matching
+        String kbd = "1\t2,q#2\t1,q,w,3#3\t2,w,e,4#4\t3,e,r,5#5\t4,r,t,6#6\t5,t,y,7#7\t6,y,u,8#8\t7,u,i,9#9\t8,i,o,0#0\t9,o,p,-#-\t0,p#q\t1,2,w,a#w\tq,a,s,e,3,2#e\tw,s,d,r,4,3#r\te,d,f,t,5,4#t\tr,f,g,y,6,5#y\tt,g,h,u,7,6#u\ty,h,j,i,8,7#i\tu,j,k,o,9,8#o\ti,k,l,p,0,9#p\to,l,-,0#a\tz,s,w,q#s\ta,z,x,d,e,w#d\ts,x,c,f,r,e#f\td,c,v,g,t,r#g\tf,v,b,h,y,t#h\tg,b,n,j,u,y#j\th,n,m,k,i,u#k\tj,m,l,o,i#l\tk,p,o#z\tx,s,a#x\tz,c,d,s#c\tx,v,f,d#v\tc,b,g,f#b\tv,n,h,g#n\tb,m,j,h#m\tn,k,j";
+        
+        // Split
+        for (String tuple : kbd.split("#")) {
+            String[] pairs = tuple.split("\t");
+            keyboard.put(pairs[0], pairs[1]);
+
+        }
+
+        String c = "";
+        do {
+            // Pull a random character
+            int index = r.nextInt(query.length());
+            c = Character.toString(query.charAt(index));
+
+            // Get typos
+            String[] typos = keyboard.get(c).split(",");
+
+            // New character
+            String c2 = typos[r.nextInt(typos.length)];
+
+            // Form query with typo
+            typo = query.substring(0, index) + c2 + query.substring(index + 1);
+
+        } while (!c.equals("+"));
+
+        // Return
+        return typo;
+        
+    }
+
+    /**
+     * Generates a missed character typo - removes one character from a string
+     * 
+     * @param query
+     * 
+     * @return query string, with one character missing
+     */
+
+    private String missedChar(String query) {
+        Random r = new Random();
+        String typo;
+        
+        // Random char
+        int index = r.nextInt(query.length());
+
+        // Remove
+        typo = query.substring(0, index) + query.substring(index + 1);
+
+        // Return
+        return typo;
+
+    }
+
+    /**
+     * Generates a transposed character typo by swapping two characters
+     * 
+     * @param query
+     * 
+     * @return query string, with two letters swapped
+     */
+
+    private String transposedChar(String query) {
+        String typo;
+        Random r = new Random();
+
+        // Random char
+        int index = r.nextInt(query.length());
+
+        // Swap
+        typo = query.substring(0, index) + query.substring(index + 1, index + 2) + query.substring(index, index + 1) + query.substring(index + 2);
+
+        // Return
+        return typo;
+
+    }
+
+    /**
+     * Generates a double character typo
+     * 
+     * @param query
+     * 
+     * @return query string, with one character duplicated
+     */
+
+    private String doubleChar(String query) {
+        Random r = new Random();
+        String typo;
+
+        // Random char
+        int index = r.nextInt(query.length());
+
+        // Swap
+        typo = query.substring(0, index) + query.substring(index - 1);
+
+        // Return
+        return typo;
+
+    }
+
+    /**
+     * Mimics a bit flipping typo, chooses one character and replaces it with one of the possibilites of a bit flip
+     * Checks regex to make sure the character is in the alphabet or set of known numbers
+     * 
+     * @param query
+     * 
+     * @deprecated Not the right type
+     * 
+     * @return query string, with one character replaced with a bit flipped version of itself
+     */
+
+    @Deprecated
+    private String bitFlip(String query) {
+        Random r = new Random();
+        String typo, new_letter;
+
+        // Regex/Mask
+        String allowed_regex = "[a-zA-Z0-9_\\-\\.]";
+        int[] masks = {128,64,32,16,8,4,2,1};
+
+        // Random char
+        int index = r.nextInt(query.length());
+        
+        // Bit flip
+        do {
+            new_letter = Character.toString(
+                (Character.toChars
+                (Integer.parseInt
+                (Integer.toHexString
+                (query.charAt(index))) ^ masks
+                            [r.nextInt(masks.length)]
+                            ))
+                            [0]
+                            ).toLowerCase();
+                            
+        } while (!new_letter.matches(allowed_regex));
+        
+        // Put typo together
+        typo = query.substring(0, index) + String.valueOf(new_letter) + query.substring(index + 1);
+
+        // Return
+        return typo;
+
+    }
+
 }
