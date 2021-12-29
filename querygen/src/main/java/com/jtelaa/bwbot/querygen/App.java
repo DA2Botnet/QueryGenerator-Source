@@ -40,8 +40,9 @@ public class App {
 
     /** Properties file path */
     public static String properties_path = "~/querygen_config.properties";
+    public static String json_path = "~/thread_config.json";
     public static String banners_directory = "~/banners/";
-
+    
     public static void main(String[] args) {
         // Check for first time setup
         boolean first_time = false;
@@ -88,7 +89,7 @@ public class App {
     private static void interfaceSetup(boolean multi_interface) {
         if (multi_interface) {
             try {
-                ThreadManager.setupProcesses("~/thread_config.json");
+                ThreadManager.setupProcesses(json_path);
     
             } catch (Exception e) {
                 Log.sendMessage("Main: ", e, ConsoleColors.RED);
