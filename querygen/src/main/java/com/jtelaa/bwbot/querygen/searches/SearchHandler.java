@@ -2,6 +2,10 @@ package com.jtelaa.bwbot.querygen.searches;
 
 import java.util.Random;
 import java.io.File;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -111,9 +115,39 @@ public class SearchHandler {
      */
 
     private ArrayList<String> pickList() {
-        // Get list
-        File file = files.get(new Random().nextInt(files.size()-1));
-        ArrayList<String> lines = FileUtil.listLinesFile(file);
+        ArrayList<String> lines = new ArrayList<>();
+
+        try {
+            // Get list
+            File file = files.get(new Random().nextInt(files.size()-1));
+
+            // Lock
+            RandomAccessFile raf = new RandomAccessFile(file, "rw");
+            FileChannel channel = raf.getChannel();
+            FileLock lock = channel.lock();
+
+            try {
+                lock = channel.tryLock();
+            
+            } catch (OverlappingFileLockException e) {
+                Log.sendMessage(log_prefix = "Retrying list pick");
+                raf.close();
+                return pickList();
+            
+            }
+
+            lines = FileUtil.listLinesFile(file);
+
+            // Close the file
+            if (lock != null) { lock.release(); }
+            raf.close();
+            channel.close();
+
+        } catch (Exception e) {
+            Log.sendMessage(log_prefix = "Retrying list pick");
+            return pickList();
+
+        }
 
         // Return list + path
         return lines;
