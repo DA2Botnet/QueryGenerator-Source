@@ -54,10 +54,10 @@ public class RequestServer extends GenericThread {
     // ------------------------- Thread Control
 
     /** Stops the thread */
-    public synchronized void stopServer() { run = false; }
+    public void stopServer() { run = false; }
 
     /** Checks if the thread is ready */
-    public synchronized boolean serverReady() { return run; }
+    public boolean serverReady() { return run; }
 
     // ------------------------- Logging
 

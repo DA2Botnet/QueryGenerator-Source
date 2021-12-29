@@ -1,7 +1,5 @@
 package com.jtelaa.bwbot.querygen.util;
 
-import java.util.LinkedList;
-
 import com.jtelaa.bwbot.querygen.App;
 import com.jtelaa.bwbot.querygen.processes.QueryGenerator;
 import com.jtelaa.bwbot.querygen.processes.ThreadManager;
@@ -173,8 +171,8 @@ public class RemoteCLI extends LocalCLI {
             int size = 0;
 
             for (QueryGenerator gen : ThreadManager.generators) {
-                if (gen.query_queue.size() > size) {
-                    size = gen.query_queue.size();
+                if (gen.queueSize() > size) {
+                    size = gen.queueSize();
 
                 }
             }
@@ -299,7 +297,7 @@ public class RemoteCLI extends LocalCLI {
 
         if (commands.length == 1 || (commands.length == 2 && commands[1].command().equalsIgnoreCase("all"))) {
             response += "Dumping all";
-            for (QueryGenerator generator : ThreadManager.generators) { generator.query_queue = new LinkedList<>(); }
+            for (QueryGenerator generator : ThreadManager.generators) { generator.clearQueue();; }
             return response;
         
         } else if (commands.length == 2) {
@@ -313,7 +311,7 @@ public class RemoteCLI extends LocalCLI {
 
                     for (QueryGenerator generator : gen) { 
                         for (int i = 0; i < qty_to_dump; i++) {
-                            generator.query_queue.remove();
+                            generator.popFromQueue();
 
                         }
                     }
@@ -323,7 +321,7 @@ public class RemoteCLI extends LocalCLI {
                 } else {
                     gen = new QueryGenerator[] { ThreadManager.generators[gen_id] };
                     response += "Dumping all from generator " + gen_id;
-                    for (QueryGenerator generator : gen) { generator.query_queue = new LinkedList<>(); }
+                    for (QueryGenerator generator : gen) { generator.clearQueue(); }
 
                 }
 
@@ -357,8 +355,8 @@ public class RemoteCLI extends LocalCLI {
 
             if (commands[2].command().equalsIgnoreCase("all")) {
                 for (QueryGenerator generator : gen) {
-                    if (qty_to_dump < generator.query_queue.size()) {
-                        qty_to_dump = generator.query_queue.size();
+                    if (qty_to_dump < generator.queueSize()) {
+                        qty_to_dump = generator.queueSize();
 
                     }
                 }
@@ -369,8 +367,8 @@ public class RemoteCLI extends LocalCLI {
 
                 } catch (NumberFormatException e) {
                     for (QueryGenerator generator : gen) {
-                        if (qty_to_dump < generator.query_queue.size()) {
-                            qty_to_dump = generator.query_queue.size();
+                        if (qty_to_dump < generator.queueSize()) {
+                            qty_to_dump = generator.queueSize();
     
                         }
                     }
@@ -391,7 +389,7 @@ public class RemoteCLI extends LocalCLI {
             
             for (QueryGenerator generator : gen) {
                 for (int i = 0; i < qty_to_dump; i++) {
-                    generator.query_queue.remove();
+                    generator.popFromQueue();
 
                 }
             }

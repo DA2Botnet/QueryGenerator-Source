@@ -35,6 +35,7 @@ public class QueryGenerator extends GenericThread {
     public QueryGenerator() {
         // Sets up file list
         SearchHandler.setupFileList();
+
         log_prefix = std_log_prefix;
         this.setName(log_prefix);
         log_prefix += ": ";
@@ -59,10 +60,10 @@ public class QueryGenerator extends GenericThread {
     // ------------------------- Thread Control
 
     /** Stops the thread */
-    public synchronized void stopGenerator() { run = false; }
+    public void stopGenerator() { run = false; }
 
     /** Checks if the thread is ready */
-    public synchronized boolean generatorReady() { return run; }
+    public boolean generatorReady() { return run; }
 
     // ------------------------- Logging
 
@@ -72,13 +73,25 @@ public class QueryGenerator extends GenericThread {
     /** Standard logging prefix */
     public volatile static String std_log_prefix = "Query Generator";
 
-    // ------------------------- Generation Settings Control
+    // ------------------------- Generated Query List
 
     /** Query queue */
-    public Queue<Query> query_queue;
+    private Queue<Query> query_queue;
 
     /** Maximum size of the query queu */
     public int MAX_QUERY_QUEUE_SIZE = 10000;
+
+    /** Add query to queue @param query Query to add */
+    public void addToQueue(Query query) { query_queue.add(query); }
+
+    /** Get the size of the query @return query size */
+    public int queueSize() { return queueSize(); }
+
+    /** Pop the top of the queue @return head of queue */
+    public Query popFromQueue() { return query_queue.poll(); }
+
+    /** Clear the query queue */
+    public void clearQueue() { query_queue = new LinkedList<>(); }
 
     // ------------------------- Query Generation Collection
     
@@ -90,6 +103,7 @@ public class QueryGenerator extends GenericThread {
 
     private Query generate() {
         return SearchHandler.getRandomSearch();
+
     }
 
     /**
@@ -147,13 +161,13 @@ public class QueryGenerator extends GenericThread {
         run = true;
         while(run) {
             // If ready for a query
-            if (query_queue.size() < MAX_QUERY_QUEUE_SIZE) {
+            if (queueSize() < MAX_QUERY_QUEUE_SIZE) {
                 // Generate random case
                 rng = rand.nextInt(100);
 
                 if (rng <= 50) {
                     // Add a single query
-                    Log.sendMessage(log_prefix, "Generating (1) - " + query_queue.size() + "/" + MAX_QUERY_QUEUE_SIZE, ConsoleColors.PURPLE);
+                    Log.sendMessage(log_prefix, "Generating (1) - " + queueSize() + "/" + MAX_QUERY_QUEUE_SIZE, ConsoleColors.PURPLE);
                     query_queue.add(generate());
 
                 } else {
@@ -161,7 +175,7 @@ public class QueryGenerator extends GenericThread {
                     int count = rand.nextInt(rng);
 
                     // Generate random query
-                    Log.sendMessage(log_prefix, "Generating ("+count+") - " + query_queue.size() + "/" + MAX_QUERY_QUEUE_SIZE, ConsoleColors.PURPLE);
+                    Log.sendMessage(log_prefix, "Generating ("+count+") - " + queueSize() + "/" + MAX_QUERY_QUEUE_SIZE, ConsoleColors.PURPLE);
                     Query[] queries = generate(count);
                     
                     // Add queries
@@ -177,7 +191,7 @@ public class QueryGenerator extends GenericThread {
 
                 } else {
                     // Wait if not ready
-                    Log.sendMessage(log_prefix, "Generation Stopped (" + query_queue.size() + ")", ConsoleColors.PURPLE_BOLD_BRIGHT);
+                    Log.sendMessage(log_prefix, "Generation Stopped (" + queueSize() + ")", ConsoleColors.PURPLE_BOLD_BRIGHT);
                     MiscUtil.waitamoment(10000);
 
                 }

@@ -99,7 +99,19 @@ public class QueryServer extends GenericThread {
     // ------------------------- Queue
 
     /** Bot queue */
-    public volatile Queue<Bot> bot_queue;
+    private Queue<Bot> bot_queue;
+
+    /** Add bot to queue @param bot bot to add */
+    public void addToQueue(Bot bot) { bot_queue.add(bot); }
+
+    /** Get the size of the query @return query size */
+    public int queueSize() { return queueSize(); }
+
+    /** Pop the top of the queue @return head of queue */
+    public Bot popFromQueue() { return bot_queue.poll(); }
+
+    /** Clear the bot queue */
+    public void clearQueue() { bot_queue = new LinkedList<>(); }
 
     // ------------------------- Socket
 
@@ -112,10 +124,10 @@ public class QueryServer extends GenericThread {
     // ------------------------- Thread Control
 
     /** Stops the thread */
-    public synchronized void stopServer() { run = false; }
+    public void stopServer() { run = false; }
 
     /** Checks if the thread is ready */
-    public synchronized boolean serverReady() { return run; }
+    public boolean serverReady() { return run; }
 
     // ------------------------- Thread Processes
 
@@ -153,14 +165,14 @@ public class QueryServer extends GenericThread {
         QueryGenerator gen = ThreadManager.generators[new Random(ThreadManager.generators.length).nextInt()];
 
         // If no requests or queries, wait
-        if (bot_queue.size() == 0 || gen.query_queue.size() == 0) {
+        if (bot_queue.size() == 0 || gen.queueSize() == 0) {
             MiscUtil.waitasec(.10);
             return;
 
         } 
 
         // Pick top off queue
-        Query query_to_send = gen.query_queue.poll();
+        Query query_to_send = gen.popFromQueue();
         Bot bot_to_serve = bot_queue.poll();
 
         // Notification
@@ -185,13 +197,13 @@ public class QueryServer extends GenericThread {
      * @param query Search query to enque
      */
 
-    public synchronized void addQuery(Query query) {
+    public void addQuery(Query query) {
         // Pull a random query generator
         QueryGenerator gen = ThreadManager.generators[new Random(ThreadManager.generators.length).nextInt()];
 
-        if (gen.query_queue.size() < gen.MAX_QUERY_QUEUE_SIZE) {
+        if (gen.queueSize() < gen.MAX_QUERY_QUEUE_SIZE) {
             // Add to queue if the que is under specified size
-            gen.query_queue.add(query);
+            gen.addToQueue(query);
 
         } else {
             do {
@@ -199,10 +211,10 @@ public class QueryServer extends GenericThread {
                 MiscUtil.waitasec();
                 gen = ThreadManager.generators[new Random(ThreadManager.generators.length).nextInt()];
 
-            } while (gen.query_queue.size() < gen.MAX_QUERY_QUEUE_SIZE);
+            } while (gen.queueSize() < gen.MAX_QUERY_QUEUE_SIZE);
 
             // Add to queue if the que is under specified size
-            gen.query_queue.add(query);
+            gen.addToQueue(query);
 
         }
     }
@@ -216,9 +228,9 @@ public class QueryServer extends GenericThread {
      */
 
     @Deprecated
-    public synchronized boolean readyForQuery() { 
+    public boolean readyForQuery() { 
         for (QueryGenerator gen : ThreadManager.generators) {
-            if (gen.query_queue.size() < gen.MAX_QUERY_QUEUE_SIZE) {
+            if (gen.queueSize() < gen.MAX_QUERY_QUEUE_SIZE) {
                 return false;
 
             }
@@ -235,7 +247,7 @@ public class QueryServer extends GenericThread {
      * @param bot bot to enque
      */
     
-    public synchronized void addBot(Bot bot) {
+    public void addBot(Bot bot) {
         if (NetTools.isValid(bot.ip)) {
             // If bot has valid ip, add it to the queue
             bot_queue.add(bot);
