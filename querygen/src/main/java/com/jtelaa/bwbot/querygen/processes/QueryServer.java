@@ -1,5 +1,9 @@
 package com.jtelaa.bwbot.querygen.processes;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
@@ -34,11 +38,16 @@ public class QueryServer extends GenericThread {
      */
 
     public QueryServer() {
+        // Log prefix
         log_prefix = std_log_prefix;
         this.setName(log_prefix);
         log_prefix += ": ";
 
+        // Port
         receive_port = BWPorts.QUERY_RECEIVE;
+
+        // Setup stats file
+        if (do_stats) { stats_ready = setupFile(); }
 
     }
     
@@ -49,11 +58,16 @@ public class QueryServer extends GenericThread {
      */
 
     public QueryServer(Ports receive_port) {
+        // Log prefix
         log_prefix = std_log_prefix;
         this.setName(log_prefix);
         log_prefix += ": ";
 
+        // Port
         this.receive_port = receive_port;
+
+        // Setup stats file
+        if (do_stats) { stats_ready = setupFile(); }
 
     }
 
@@ -64,11 +78,16 @@ public class QueryServer extends GenericThread {
      */
 
     public QueryServer(int id) {
+        // Log prefix
         this.log_prefix = std_log_prefix + "(" + id + ")";
         this.setName(log_prefix);
         this.log_prefix += ": ";
 
+        // Port
         receive_port = BWPorts.QUERY_RECEIVE;
+
+        // Setup stats file
+        if (do_stats) { stats_ready = setupFile(); }
 
     }
 
@@ -80,11 +99,16 @@ public class QueryServer extends GenericThread {
      */
 
     public QueryServer(int id, Ports receive_port) {
+        // Log prefix
         this.log_prefix = std_log_prefix + "(" + id + ")";
         this.setName(log_prefix);
         this.log_prefix += ": ";
 
+        // Port
         this.receive_port = receive_port;
+
+        // Setup stats file
+        if (do_stats) { stats_ready = setupFile(); }
 
     }
 
@@ -153,6 +177,68 @@ public class QueryServer extends GenericThread {
 
     }
 
+    // ------------------------- Stats
+
+    /** Stats readieness */
+    private boolean stats_ready = false, do_stats = true;
+
+    /** Standard stats file name */
+    public volatile static String std_stats_file_name = "qstats.csv";
+    
+    /** Stats file path */
+    public volatile static String stats_file_path = "~/qgen/stats/";
+
+    /** Stats file name */
+    private String stats_file_name;
+
+    /** Stats file */
+    private FileWriter stats_file;
+
+    /**
+     * Setup the file
+     */
+
+    private boolean setupFile() {
+        stats_file_name = stats_file_path + this.getName() + "_" + stats_file_name;
+        File file = new File(stats_file_name);
+
+        try {
+            stats_file = new FileWriter(file);
+
+            stats_ready = true;
+            return stats_ready;
+
+        } catch (IOException e) {
+            Log.sendMessage(log_prefix, e, ConsoleColors.RED);
+            
+            stats_ready = false;
+            return stats_ready;
+
+        }
+    }
+    
+    /**
+     * Adds a new entry into the log
+     * 
+     * @param host IP address of the requesting host
+     */
+
+    public void newStatsEntry(String host) {
+        if (!stats_ready) { return; }
+
+        try {
+            stats_file.write(System.currentTimeMillis() + "," + host + "\n");
+
+        } catch (FileNotFoundException e) {
+            Log.sendMessage(log_prefix, "File was not created", ConsoleColors.RED);
+            setupFile();
+
+        } catch (IOException e1) {
+            Log.sendMessage(log_prefix, e1);
+
+        }
+    }
+
     // ------------------------- Request Filler
 
     /**
@@ -176,16 +262,17 @@ public class QueryServer extends GenericThread {
         Bot bot_to_serve = bot_queue.poll();
 
         // Notification
-        Log.sendMessage(log_prefix, "Serving " + bot_to_serve.ip, ConsoleColors.YELLOW);
+        Log.sendMessage(log_prefix, "Serving " + bot_to_serve.ip, ConsoleColors.CYAN);
+        newStatsEntry(bot_to_serve.ip);
 
         // Setup client
-        query_socket = new ClientUDP(bot_to_serve.ip, receive_port, log_prefix, ConsoleColors.YELLOW);
+        query_socket = new ClientUDP(bot_to_serve.ip, receive_port, log_prefix, ConsoleColors.CYAN);
 
         // Send and then close
         if (query_socket.startClient()) {
             query_socket.sendMessage(query_to_send.getQuery());
             query_socket.closeClient();
-            Log.sendMessage(log_prefix, "Done serving " + bot_to_serve.ip, ConsoleColors.YELLOW);
+            Log.sendMessage(log_prefix, "Done serving " + bot_to_serve.ip, ConsoleColors.CYAN);
 
         }
     }
