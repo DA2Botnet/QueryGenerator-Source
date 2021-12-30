@@ -39,9 +39,10 @@ public class App {
     public static Properties my_config;
 
     /** Properties file path */
-    public static String properties_path = "~/querygen_config.properties";
-    public static String json_path = "~/thread_config.json";
-    public static String banners_directory = "~/banners/";
+    public static String properties_path = "~/qgen/querygen_config.properties";
+    public static String json_path = "~/qgen/thread_config.json";
+    public static String banners_directory = "~/qgen/banners/";
+    public volatile static String stats_file_path = "~/qgen/stats/";
     
     public static void main(String[] args) {
         // Check for first time setup
@@ -57,6 +58,8 @@ public class App {
 
             }
         }
+
+        createDirectories();
 
         // Load normally if not first time
         if (first_time) { 
@@ -146,6 +149,16 @@ public class App {
             e.printStackTrace();
 
         }
+    }
+
+    /**
+     * Load the remote files
+     */
+
+    private static void createDirectories() {
+        // Make root directory
+        ComputerControl.sendCommand("cd ~/ && mkdir qgen");
+
     }
 
     /**

@@ -4,15 +4,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 
 import com.jtelaa.bwbot.bwlib.BWPorts;
 import com.jtelaa.bwbot.bwlib.Query;
+import com.jtelaa.bwbot.querygen.App;
 import com.jtelaa.bwbot.querygen.util.GenericThread;
 import com.jtelaa.da2.lib.bot.Bot;
 import com.jtelaa.da2.lib.console.ConsoleColors;
+import com.jtelaa.da2.lib.control.ComputerControl;
 import com.jtelaa.da2.lib.log.Log;
 import com.jtelaa.da2.lib.misc.MiscUtil;
 import com.jtelaa.da2.lib.net.NetTools;
@@ -184,9 +188,6 @@ public class QueryServer extends GenericThread {
 
     /** Standard stats file name */
     public volatile static String std_stats_file_name = "qstats.csv";
-    
-    /** Stats file path */
-    public volatile static String stats_file_path = "~/qgen/stats/";
 
     /** Stats file name */
     private String stats_file_name;
@@ -199,7 +200,15 @@ public class QueryServer extends GenericThread {
      */
 
     private boolean setupFile() {
-        stats_file_name = stats_file_path + this.getName() + "_" + stats_file_name;
+        stats_file_name = App.stats_file_path + this.getName() + "_" + stats_file_name;
+
+        // If directory exists, create it
+        if (Files.isDirectory(Paths.get(App.stats_file_path))) {
+            Log.sendLogMessage("Stats directory not found. Creating....", ConsoleColors.YELLOW);
+            ComputerControl.sendCommand("mkdir " + App.stats_file_path);
+            
+        }
+
         File file = new File(stats_file_name);
 
         try {
