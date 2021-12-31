@@ -202,15 +202,38 @@ public class SearchHandler {
                 query = doubleChar(query);
                 break;
 
-            // Bit flip
+            // Random word
             case 7:
-                query = bitFlip(query);
+                query = removeRandomWord(query);
                 break;
+
 
         }
 
         // Return
         return query;
+
+    }
+
+    private String removeRandomWord(String query) {
+        // Default regex
+        char regex = query.contains('+') ? '+' : ' ';
+        String new_query = "";
+
+        // Split based on regex
+        String[] split = query.split(regex);
+
+        // Choose index to remove
+        int remove_index = new Random.nextInt(split.length - 1);
+
+        // Rebuild string
+        for (int i = 0; i < split.length; i++) {
+            if (i != remove_index) { new_query += split[i] + regex; }
+
+        }
+
+        // Return
+        return split.substring(0, new_query.lastIndexOf(regex));
 
     }
 
