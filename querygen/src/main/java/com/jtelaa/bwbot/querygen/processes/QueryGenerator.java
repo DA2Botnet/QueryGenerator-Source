@@ -88,6 +88,14 @@ public class QueryGenerator extends GenericThread {
     /** Add query to queue @param query Query to add */
     public void addToQueue(Query query) { query_queue.add(query); }
 
+    /** Add queries to queue @param queries Queries to add */
+    public void addToQueue(Query[] queries) { 
+        for (Query query : queries) {
+            query_queue.add(query);
+
+        }  
+    }
+
     /** Get the size of the query @return query size */
     public int queueSize() { return queueSize(); }
 
@@ -166,28 +174,12 @@ public class QueryGenerator extends GenericThread {
         while(run) {
             // If ready for a query
             if (queueSize() < MAX_QUERY_QUEUE_SIZE) {
-                // Generate random case
-                rng = rand.nextInt(100);
+                // Rng number of queries
+                int count = rand.nextInt(200);
 
-                if (rng <= 50) {
-                    // Add a single query
-                    Log.sendMessage(log_prefix, "Generating (1) - " + queueSize() + "/" + MAX_QUERY_QUEUE_SIZE, ConsoleColors.PURPLE);
-                    query_queue.add(generate());
-
-                } else {
-                    // Rng number of queries
-                    int count = rand.nextInt(rng);
-
-                    // Generate random query
-                    Log.sendMessage(log_prefix, "Generating ("+count+") - " + queueSize() + "/" + MAX_QUERY_QUEUE_SIZE, ConsoleColors.PURPLE);
-                    Query[] queries = generate(count);
-                    
-                    // Add queries
-                    for (Query query : queries) {
-                        query_queue.add(query);
-
-                    }
-                }
+                // Generate random query
+                Log.sendMessage(log_prefix, "Generating ("+count+") - " + queueSize() + "/" + MAX_QUERY_QUEUE_SIZE, ConsoleColors.PURPLE);
+                addToQueue(generate(count));
 
             } else {
                 if (Log.history.get(Log.history.size()-1).contains("Generation Stopped")) {
