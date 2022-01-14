@@ -88,6 +88,9 @@ public class QueryGenerator extends GenericThread {
     /** Add query to queue @param query Query to add */
     public void addToQueue(Query query) { query_queue.add(query); }
 
+    /** Add query to queue @param query Query to add */
+    public void addToQueue(String query) { addToQueue(new Query(query)); }
+
     /** Add queries to queue @param queries Queries to add */
     public void addToQueue(Query[] queries) { 
         for (Query query : queries) {
