@@ -90,6 +90,9 @@ public class RemoteCLI extends LocalCLI {
 
         //     }
 
+        } else if (Cases.checkCase(cmd, "reload-searches")) {
+            SearchHandler.loadRemoteSearches();
+            
         }
 
         return response;
