@@ -193,7 +193,7 @@ public class SearchHandler {
             channel.close();
 
         } catch (Exception e) {
-            Log.sendMessage(log_prefix = "Retrying list pick");
+            Log.sendMessage(log_prefix + "Retrying list pick");
             return pickList();
 
         }
