@@ -178,7 +178,7 @@ public class App {
         ComputerControl.sendCommand("cd ~/ && curl https://raw.githubusercontent.com/DA2Botnet/QueryGenerator-Source/main/config_template/thread_config.jsom > thread_config.json");
 
         // Load searches
-        SearchHandler.loadRemoteSearches();
+        if (!SearchHandler.searchesPresent()) { SearchHandler.loadRemoteSearches(); }
 
     }
 
