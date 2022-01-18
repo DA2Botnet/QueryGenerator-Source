@@ -53,6 +53,55 @@ public class SearchHandler {
     }
 
     /**
+     * Loads searches fromm the git repo using svn
+     * 
+     * @param git_url Folder url in a git repo
+     */
+
+    public static synchronized void loadRemoteSearches(String git_url) {
+        // Get searches
+        Log.sendManSysMessage(log_prefix + "Loading searches from " + git_url);
+        ComputerControl.sendCommand("cd ~/ && svn checkout " + git_url);
+        
+    }
+
+    /**
+     * Check if searches are present in the directory
+     *
+     * @return if number of searches are aboce a minimum threshold (10)
+     */
+
+    public static synchronized boolean searchesPresent() { return searchesPresent(10); }
+
+    /**
+     * Check if searches are present in the directory
+     *
+     * @param min_search_source_files minimum count of files in the directory
+     *
+     * @return if number of searches are above a minimum threshold
+     */
+
+    public static synchronized boolean searchesPresent(int min_search_source_files) {
+        try {
+            int source_file_count = 0;
+
+            DirectoryStream<Path> dirStream = Files.newDirectoryStream(PATH);
+            
+            while(dirStream.iterator().hasNext()) {
+                source_file_count++;
+
+            }
+
+            return source_file_count >= min_search_source_files;
+
+        } catch (Exception e) {
+            Log.sendMessage(log_prefix, e, ConsoleColors.RED);
+            return false;
+
+        }
+    }
+
+    /**
      * Setup file list (run on init)
      */
 
@@ -144,7 +193,7 @@ public class SearchHandler {
             channel.close();
 
         } catch (Exception e) {
-            Log.sendMessage(log_prefix = "Retrying list pick");
+            Log.sendMessage(log_prefix + "Retrying list pick");
             return pickList();
 
         }

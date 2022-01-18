@@ -90,6 +90,33 @@ public class RemoteCLI extends LocalCLI {
 
         //     }
 
+        } else if (Cases.checkCase(cmd, "reload-searches")) {
+            SearchHandler.loadRemoteSearches();
+            
+        } else if (Cases.checkCase(cmd, "start-all")) {
+            ThreadManager.startProcesses();
+
+        } else if (Cases.checkCase(cmd, "stop-all")) {
+            ThreadManager.stopProcesses();
+        
+        } else if (Cases.checkCase(cmd, "start-gen")) {
+            ThreadManager.startGenerators();
+
+        } else if (Cases.checkCase(cmd, "stop-gen")) {
+            ThreadManager.stopGenerators();
+
+        } else if (Cases.checkCase(cmd, "start-qsrv")) {
+            ThreadManager.startQueryServers();
+
+        } else if (Cases.checkCase(cmd, "stop-qsrv")) {
+            ThreadManager.stopQueryServers();
+
+        } else if (Cases.checkCase(cmd, "start-rsrv")) {
+            ThreadManager.startRequestServers();
+
+        } else if (Cases.checkCase(cmd, "stop-rsrv")) {
+            ThreadManager.stopRequestServers();
+            
         }
 
         return response;
