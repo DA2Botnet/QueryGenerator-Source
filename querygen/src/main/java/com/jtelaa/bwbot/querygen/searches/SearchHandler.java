@@ -212,53 +212,61 @@ public class SearchHandler {
      */
 
     private String mangle(String query) {
-        // Pick case
-        int num = new Random().nextInt(11);
+        return mangle(query, new Random().nextInt(100));
 
-        switch (num) {
-            // All upper case
-            case 8:
-                query = query.toUpperCase();
-                break;
+    }
 
-            // Toggle case
-            case 1: 
-                query = randomToggle(query);
-                break;
+    /**
+     * Mangle the search query
+     *
+     * @param query query to mangle
+     * @param num manual typo choice
+     */
 
-            // Random uppercase letter
-            case 2: 
-                query = upper(query);
-                break;
+    private String mangle(String query, int num) {
+        if (num <= 10) {
+            return query.toUpperCase();
 
-            // Adjacent letter
-            case 3:
-                query = wrongKey(query);
-                break;
+        } else if (num > 10 && num <= 20) {
+            query = randomToggle(query);
+            
+            if (num <= 12) {
+                return mangle(query);
 
-            // Remove character
-            case 4:
-                query = missedChar(query);
-                break;
+            } else if (num > 18) {
+                return mangle(query, new Random().nextInt(10) + 10);
 
-            // Character Swap
-            case 5:
-                query = transposedChar(query);
-                break;
+            }
 
-            // Double characteer
-            case 6:
-                query = doubleChar(query);
-                break;
+        } else if (num > 20 && num <= 30) {
+            query = upper(query);
 
-            // Random word
-            case 7:
-                query = removeRandomWord(query);
-                break;
+            if (num > 25) {
+                return mangle(query, new Random().nextInt(10) + 20);
 
+            }
 
+        } else if (num > 30 && num <= 40) {
+            query = wrongKey(query);
+
+        } else if (num > 40 && num <= 50) {
+            query = missedChar(query);
+
+        } else if (num > 50 && num <= 60) {
+            query = transposedChar(query);
+
+        } else if (num > 60 && num <= 70) {
+            query = doubleChar(query);
+
+        } else if (num > 70 && num <= 80) {
+            query = removeRandomWord(query);
         }
 
+        if (num >= ((num % 10 == 0) ? num : ((num / 10 + 1) * 10)) - 2) {
+            return mangle(query);
+
+        }
+        
         // Return
         return query;
 
